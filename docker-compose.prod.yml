@@ -1,0 +1,32 @@
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+
+    container_name: bizflow-backend-prod
+
+    env_file:
+      - ./backend/.env
+
+    ports:
+      - "5000:5000"
+
+    restart: always
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+
+    container_name: bizflow-frontend-prod
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      - backend
+
+    restart: always

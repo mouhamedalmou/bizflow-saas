@@ -1,0 +1,26 @@
+.github/workflows/docker-ci.yml 
+
+name: Docker CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -f backend/Dockerfile.prod -t bizflow-backend-prod ./backend
+
+      - name: Build frontend Docker image
+        run: docker build -f frontend/Dockerfile.prod -t bizflow-frontend-prod ./frontend
+
+      - name: Validate production compose config
+        run: docker compose -f docker-compose.prod.yml config
