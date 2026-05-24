@@ -1,5 +1,12 @@
 # BizFlow SaaS
 
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb)
+![AWS](https://img.shields.io/badge/AWS_S3-232F3E?style=for-the-badge&logo=amazonaws)
+
+![BizFlow Dashboard](./screenshots/dashboard.png)
+
 Modern full-stack MERN SaaS platform for inventory management, product ordering, customer dashboards, and admin analytics.
 
 ---
