@@ -15,7 +15,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user?.token) {
       navigate("/dashboard", { replace: true });
     }
   }, [navigate, user]);
@@ -35,7 +35,6 @@ const Login = () => {
     try {
       const { data } = await api.post("/auth/login", formData);
 
-      localStorage.setItem("user", JSON.stringify(data));
       setUser(data);
       navigate(location.state?.from?.pathname || "/dashboard", {
         replace: true,
@@ -90,25 +89,35 @@ const Login = () => {
             >
               Password
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
+              <input
+                id="password"
+                name="password"
+                type="password"
               value={formData.password}
               onChange={handleChange}
               required
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder="Your password"
-            />
-          </div>
+                placeholder="Your password"
+              />
+            </div>
 
-          <button
+            <button
             type="submit"
             disabled={loading}
             className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+            Forgot your password?{" "}
+            <Link
+              to="/forgot-password"
+              className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Reset it
+            </Link>
+          </p>
         </form>
 
         <p className="mt-4 text-center text-sm text-slate-500">

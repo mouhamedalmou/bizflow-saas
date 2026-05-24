@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }) => {
     return <Loader label="Checking session..." />;
   }
 
-  if (!user) {
+  if (!user?.token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 

@@ -4,7 +4,7 @@ import api from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 
 const Register = () => {
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -12,10 +12,11 @@ const Register = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user?.token) {
       navigate("/dashboard", { replace: true });
     }
   }, [navigate, user]);
@@ -30,14 +31,18 @@ const Register = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
 
     try {
       const { data } = await api.post("/auth/register", formData);
 
-      localStorage.setItem("user", JSON.stringify(data));
-      setUser(data);
-      navigate("/dashboard", { replace: true });
+      setSuccess(data.message || "Account created. Please verify your email.");
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
     } catch (err) {
       const message =
         err.response?.data?.errors?.[0]?.message ||
@@ -63,6 +68,12 @@ const Register = () => {
         {error && (
           <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
             {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            {success}
           </div>
         )}
 

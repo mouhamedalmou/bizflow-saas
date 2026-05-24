@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthContext } from "./authContextCore";
 
 const getStoredUser = () => {
@@ -9,7 +9,14 @@ const getStoredUser = () => {
   }
 
   try {
-    return JSON.parse(storedUser);
+    const user = JSON.parse(storedUser);
+
+    if (!user?.token) {
+      localStorage.removeItem("user");
+      return null;
+    }
+
+    return user;
   } catch {
     localStorage.removeItem("user");
     return null;
@@ -17,12 +24,36 @@ const getStoredUser = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(getStoredUser);
+  const [user, setCurrentUser] = useState(getStoredUser);
   const [loading] = useState(false);
+
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      localStorage.removeItem("user");
+      setCurrentUser(null);
+    };
+
+    window.addEventListener("bizflow:auth-expired", handleAuthExpired);
+
+    return () => {
+      window.removeEventListener("bizflow:auth-expired", handleAuthExpired);
+    };
+  }, []);
+
+  const setUser = (nextUser) => {
+    if (!nextUser?.token) {
+      localStorage.removeItem("user");
+      setCurrentUser(null);
+      return;
+    }
+
+    localStorage.setItem("user", JSON.stringify(nextUser));
+    setCurrentUser(nextUser);
+  };
 
   const logout = () => {
     localStorage.removeItem("user");
-    setUser(null);
+    setCurrentUser(null);
   };
 
   return (

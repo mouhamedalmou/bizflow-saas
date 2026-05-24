@@ -13,6 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Navigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
@@ -35,6 +36,10 @@ const Dashboard = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!user?.token) {
+      return;
+    }
+
     const fetchDashboard = async () => {
       setError("");
       setLoading(true);
@@ -53,6 +58,10 @@ const Dashboard = () => {
           setMyOrders(data);
         }
       } catch (err) {
+        if (err.response?.status === 401) {
+          return;
+        }
+
         setError(err.response?.data?.message || "Unable to load dashboard");
       } finally {
         setLoading(false);
@@ -60,7 +69,11 @@ const Dashboard = () => {
     };
 
     fetchDashboard();
-  }, [user?.role]);
+  }, [user?.role, user?.token]);
+
+  if (!user?.token) {
+    return <Navigate to="/login" replace />;
+  }
 
   if (loading) {
     return <Loader label="Loading dashboard..." />;

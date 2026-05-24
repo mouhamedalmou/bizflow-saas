@@ -11,6 +11,9 @@ import { useTheme } from "./hooks/useTheme";
 
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Products = lazy(() => import("./pages/Products"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
@@ -66,6 +69,30 @@ function App() {
             element={
               <main className="mx-auto max-w-6xl px-4 py-6">
                 <Register />
+              </main>
+            }
+          />
+          <Route
+            path="/verify-email/:token"
+            element={
+              <main>
+                <VerifyEmail />
+              </main>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <main>
+                <ForgotPassword />
+              </main>
+            }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={
+              <main>
+                <ResetPassword />
               </main>
             }
           />

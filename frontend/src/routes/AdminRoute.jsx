@@ -10,7 +10,7 @@ const AdminRoute = ({ children }) => {
     return <Loader label="Checking permissions..." />;
   }
 
-  if (!user) {
+  if (!user?.token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
