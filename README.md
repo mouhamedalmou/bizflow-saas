@@ -17,20 +17,51 @@ https://your-backend-url.com
 # Screenshots
 
 ## Dashboard Analytics
+file: `creenshots/readme.png`
+
+File: `screenshots/dashboard.png`
+
+![Dashboard Analytics](screenshots/dashboard.png)
 
 - Revenue analytics
 - Orders analytics
 - Monthly sales charts
 - SaaS admin overview
 
+## Customer Dashboard
+
+File: `screenshots/dashboard-client.png`
+
+![Customer Dashboard](screenshots/dashboard-client.png)
+
+## Dashboard Overview
+
+File: `screenshots/dashboard (2).png`
+
+![Dashboard Overview](<screenshots/dashboard (2).png>)
+
 ## Products Page
+
+File: `screenshots/products.png`
+
+![Products Page](screenshots/products.png)
 
 - Product catalog
 - AWS S3 image integration
 - Inventory tracking
 - Order workflow
 
+## My Orders
+
+File: `screenshots/my orders.png`
+
+![My Orders](<screenshots/my orders.png>)
+
 ## Admin Products
+
+File: `screenshots/admin-products.png`
+
+![Admin Products](screenshots/admin-products.png)
 
 - Create products
 - Edit products
@@ -38,6 +69,10 @@ https://your-backend-url.com
 - Image upload to AWS S3
 
 ## Admin Orders
+
+File: `screenshots/admin-orders.png`
+
+![Admin Orders](screenshots/admin-orders.png)
 
 - Customer order management
 - Order status workflow
