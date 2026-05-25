@@ -40,16 +40,26 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
 
-  await sendEmail({
-    to: user.email,
-    subject: "Verify your BizFlow account",
-    html: `
-      <h2>Welcome to BizFlow SaaS</h2>
-      <p>Please verify your email address by clicking the link below:</p>
-      <a href="${verificationUrl}">${verificationUrl}</a>
-      <p>This link expires in 24 hours.</p>
-    `,
-  });
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Verify your BizFlow account",
+      html: `
+        <h2>Welcome to BizFlow SaaS</h2>
+        <p>Please verify your email address by clicking the link below:</p>
+        <a href="${verificationUrl}">${verificationUrl}</a>
+        <p>This link expires in 24 hours.</p>
+      `,
+    });
+  } catch (error) {
+    await User.findByIdAndDelete(user._id);
+    throw new ApiError(
+      error.statusCode || 502,
+      error.statusCode
+        ? error.message
+        : "Unable to send verification email. Please try again later."
+    );
+  }
 
   res.status(201).json({
     message: "User registered. Please verify your email.",
@@ -129,11 +139,24 @@ const forgotPassword = asyncHandler(async (req, res) => {
     process.env.FRONTEND_URL || process.env.CLIENT_URL || "http://localhost:5173";
   const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
-  await sendEmail({
-    to: user.email,
-    subject: "Reset your BizFlow password",
-    html: `<p>Click here to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`,
-  });
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Reset your BizFlow password",
+      html: `<p>Click here to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`,
+    });
+  } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    throw new ApiError(
+      error.statusCode || 502,
+      error.statusCode
+        ? error.message
+        : "Unable to send reset email. Please try again later."
+    );
+  }
 
   res.json({ message: "If this email exists, a reset link has been sent" });
 });

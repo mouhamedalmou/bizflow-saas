@@ -1,18 +1,28 @@
 const nodemailer = require("nodemailer");
+const ApiError = require("./apiError");
 
 const sendEmail = async ({ to, subject, html }) => {
+  const host = process.env.EMAIL_HOST || "smtp.gmail.com";
+  const port = Number(process.env.EMAIL_PORT) || 587;
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASS;
+
+  if (!user || !pass) {
+    throw new ApiError(500, "Email service is not configured");
+  }
+
   const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT),
-    secure: false,
+    host,
+    port,
+    secure: port === 465,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user,
+      pass,
     },
   });
 
   await transporter.sendMail({
-    from: `"BizFlow SaaS" <${process.env.EMAIL_USER}>`,
+    from: `"BizFlow SaaS" <${user}>`,
     to,
     subject,
     html,

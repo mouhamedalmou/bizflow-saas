@@ -4,27 +4,73 @@
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb)
 ![AWS](https://img.shields.io/badge/AWS_S3-232F3E?style=for-the-badge&logo=amazonaws)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 
 ![BizFlow Dashboard](./screenshots/dashboard.png)
 
 Modern full-stack MERN SaaS platform for inventory management, product ordering, customer dashboards, and admin analytics.
+
+This project demonstrates a production-ready MERN SaaS deployment workflow using AWS EC2, Docker, Nginx, HTTPS, and MongoDB Atlas.
 
 ---
 
 # Live Demo
 
 Frontend:  
-https://your-frontend-url.com
+https://bizflowsaas.duckdns.org
 
 Backend API:  
-https://your-backend-url.com
+https://bizflowsaas.duckdns.org/api
+
+---
+
+# Production Deployment
+
+- AWS EC2 Ubuntu Server
+- Docker & Docker Compose
+- Nginx Reverse Proxy
+- HTTPS SSL with Let's Encrypt
+- MongoDB Atlas
+- DuckDNS custom domain
+
+---
+
+# Production Architecture
+
+```txt
+Client Browser
+|
+v
+Nginx Reverse Proxy (HTTPS)
+|
+v
+React Frontend Container
+|
+v
+Express API Container
+|
+v
+MongoDB Atlas
+```
+
+BizFlow is deployed as a containerized production application on a Linux server. Nginx terminates HTTPS traffic, serves the public domain, and routes API requests to the backend container while the React frontend runs in its own containerized environment.
+
+## Infrastructure Highlights
+
+- Dockerized frontend and backend services
+- HTTPS production environment with Let's Encrypt
+- Nginx reverse proxy routing for `/` and `/api`
+- MongoDB Atlas cloud database
+- AWS S3 image storage for product uploads
+- Linux server deployment on AWS EC2
+- DuckDNS domain connected to the EC2 instance
 
 ---
 
 # Screenshots
 
 ## Dashboard Analytics
-file: `creenshots/readme.png`
 
 File: `screenshots/dashboard.png`
 
@@ -164,11 +210,14 @@ File: `screenshots/admin-orders.png`
 ## Cloud & DevOps
 
 - AWS S3
+- AWS EC2
 - MongoDB Atlas
 - Docker
+- Docker Compose
 - PM2
 - Nginx
-- EC2
+- Let's Encrypt SSL
+- DuckDNS
 
 ---
 
@@ -195,9 +244,11 @@ File: `screenshots/admin-orders.png`
 
 ## Deployment
 
-- Frontend deployed on Vercel
-- Backend deployed on Render / EC2
-- HTTPS with Nginx reverse proxy
+- Full application deployed on AWS EC2
+- Frontend and backend run as Docker containers
+- Nginx handles HTTPS and reverse proxy routing
+- MongoDB Atlas provides the production database
+- DuckDNS provides the public production domain
 
 ---
 
@@ -205,10 +256,13 @@ File: `screenshots/admin-orders.png`
 
 1. User registers an account.
 2. Password is hashed using bcryptjs.
-3. JWT token is generated.
-4. Token is stored in localStorage.
-5. Protected routes verify authentication.
-6. Admin middleware restricts admin-only routes.
+3. Email verification token is generated.
+4. User verifies email through a secure verification link.
+5. User logs in and receives a JWT token.
+6. Token is stored in localStorage.
+7. Protected routes verify authentication.
+8. Admin middleware restricts admin-only routes.
+9. Password reset flow sends secure email reset links.
 
 ---
 
