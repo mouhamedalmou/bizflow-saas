@@ -22,5 +22,8 @@ jobs:
       - name: Build frontend Docker image
         run: docker build -f frontend/Dockerfile.prod -t bizflow-frontend-prod ./frontend
 
+      - name: Create backend env file for compose validation
+        run: cp backend/.env.example backend/.env
+
       - name: Validate production compose config
-        run: docker compose -f docker-compose.prod.yml config
+        run: docker compose -f docker-compose.prod.yml config --quiet
