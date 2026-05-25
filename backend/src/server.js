@@ -74,8 +74,11 @@ app.use("/api/users", userRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/upload", uploadRoutes);
-app.get("/", (req, res) => {
-  res.send("BizFlow SaaS API is running...");
+app.get("/api", (req, res) => {
+  res.json({
+    success: true,
+    message: "BizFlow SaaS API running",
+  });
 });
 
 app.use(notFound);
