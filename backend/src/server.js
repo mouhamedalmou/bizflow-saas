@@ -22,8 +22,11 @@ const app = express();
 connectDB();
 
 const allowedOrigins = [
+  process.env.ALLOWED_ORIGINS,
   process.env.CLIENT_URL,
   process.env.FRONTEND_URL,
+  "https://bizflowsaas.duckdns.org",
+  "http://bizflowsaas.duckdns.org",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://localhost:3000",
