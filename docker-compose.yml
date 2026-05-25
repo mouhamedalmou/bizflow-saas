@@ -4,8 +4,8 @@ services:
     container_name: bizflow-backend
     ports:
       - "5000:5000"
-    # env_file:
-    #   - ./backend/.env
+    env_file:
+      - ./backend/.env
     restart: unless-stopped
 
   frontend:
