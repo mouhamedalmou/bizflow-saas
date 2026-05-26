@@ -220,6 +220,15 @@ File: `screenshots/admin-orders.png`
 - Let's Encrypt SSL
 - DuckDNS
 
+## Cloud Services
+
+- AWS EC2 (production server)
+- AWS S3 (product image storage)
+- MongoDB Atlas (database)
+- Nginx reverse proxy
+- Let's Encrypt HTTPS
+- Docker & Docker Compose
+
 ---
 
 # Architecture
@@ -309,6 +318,12 @@ src/
 |-- routes/
 `-- server.js
 ```
+
+---
+
+# Contact Me
+
+- LinkedIn: https://www.linkedin.com/in/almou-inguidazane-mouhamed
 
 ---
 
