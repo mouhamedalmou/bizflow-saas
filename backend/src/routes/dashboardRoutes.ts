@@ -1,0 +1,11 @@
+import { Router } from "express";
+import { getDashboardStats, getOrdersTrend, getRecentOrders, getRevenue, getTopProducts } from "../controllers/dashboardController";
+import { adminOnly, protect } from "../middleware/authMiddleware";
+const router = Router();
+router.use(protect, adminOnly);
+router.get("/stats", getDashboardStats);
+router.get("/revenue", getRevenue);
+router.get("/orders-trend", getOrdersTrend);
+router.get("/top-products", getTopProducts);
+router.get("/recent-orders", getRecentOrders);
+export default router;

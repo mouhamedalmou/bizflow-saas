@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { registerUser, loginUser, logoutUser, getMe, verifyEmail, forgotPassword, resetPassword } from "../controllers/authController";
+import { protect } from "../middleware/authMiddleware";
+import validate from "../middleware/validateMiddleware";
+import { registerValidation, loginValidation, forgotPasswordValidation, resetPasswordValidation } from "../validations/authValidation";
+const router = Router();
+router.post("/register", registerValidation, validate, registerUser);
+router.post("/login", loginValidation, validate, loginUser);
+router.post("/logout", protect, logoutUser);
+router.get("/me", protect, getMe);
+router.get("/verify-email/:token", verifyEmail);
+router.post("/forgot-password", forgotPasswordValidation, validate, forgotPassword);
+router.post("/reset-password/:token", resetPasswordValidation, validate, resetPassword);
+export default router;

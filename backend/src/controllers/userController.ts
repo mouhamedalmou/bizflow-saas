@@ -1,0 +1,10 @@
+import type { Request, Response } from "express";
+import User from "../models/User";
+import asyncHandler from "../utils/asyncHandler";
+import ApiError from "../utils/apiError";
+import type { ApiResponse, IdParams, IUser, UserRole } from "../types";
+const fields = "name email role avatar isEmailVerified createdAt updatedAt";
+export const getUsers = asyncHandler(async (_req: Request, res: Response<ApiResponse<IUser[]>>) => { const users = await User.find().select(fields).sort({ createdAt: -1 }); res.json({ success: true, data: users }); });
+export const getUserById = asyncHandler(async (req: Request<IdParams>, res: Response<ApiResponse<IUser>>) => { const user = await User.findById(req.params.id).select(fields); if (!user) throw new ApiError(404, "User not found"); res.json({ success: true, data: user }); });
+export const updateUser = asyncHandler(async (req: Request<IdParams, ApiResponse<IUser>, { name?: string; role?: UserRole; avatar?: string }>, res: Response<ApiResponse<IUser>>) => { const allowed: { name?: string; role?: UserRole; avatar?: string } = {}; if (req.body.name !== undefined) allowed.name = req.body.name; if (req.body.role !== undefined) allowed.role = req.body.role; if (req.body.avatar !== undefined) allowed.avatar = req.body.avatar; const user = await User.findByIdAndUpdate(req.params.id, allowed, { new: true, runValidators: true }).select(fields); if (!user) throw new ApiError(404, "User not found"); res.json({ success: true, data: user }); });
+export const deleteUser = asyncHandler(async (req: Request<IdParams>, res: Response<ApiResponse<never>>) => { if (req.user?.id === req.params.id) throw new ApiError(409, "You cannot delete your own account"); const user = await User.findByIdAndDelete(req.params.id); if (!user) throw new ApiError(404, "User not found"); res.json({ success: true, message: "User deleted successfully" }); });

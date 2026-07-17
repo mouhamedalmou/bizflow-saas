@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { createProduct, deleteProduct, getLowStockProducts, getProductById, getProducts, updateProduct } from "../controllers/productController";
+import { adminOnly, protect } from "../middleware/authMiddleware";
+import upload from "../middleware/uploadMiddleware";
+import validate from "../middleware/validateMiddleware";
+import { createProductValidation, productIdParam, updateProductValidation } from "../validations/productValidation";
+const router = Router();
+router.get("/", getProducts);
+router.get("/low-stock", protect, adminOnly, getLowStockProducts);
+router.get("/:id", productIdParam, validate, getProductById);
+router.post("/", protect, adminOnly, upload.single("image"), createProductValidation, validate, createProduct);
+router.put("/:id", protect, adminOnly, productIdParam, updateProductValidation, validate, updateProduct);
+router.delete("/:id", protect, adminOnly, productIdParam, validate, deleteProduct);
+export default router;

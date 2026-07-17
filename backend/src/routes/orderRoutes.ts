@@ -1,0 +1,13 @@
+import { Router } from "express";
+import { cancelOrder, createOrder, getAllOrders, getMyOrders, getOrderById, updateOrderStatus } from "../controllers/orderController";
+import { adminOnly, protect } from "../middleware/authMiddleware";
+import validate from "../middleware/validateMiddleware";
+import { createOrderValidation, updateOrderStatusValidation } from "../validations/orderValidation";
+const router = Router();
+router.post("/", protect, createOrderValidation, validate, createOrder);
+router.get("/", protect, adminOnly, getAllOrders);
+router.get("/my-orders", protect, getMyOrders);
+router.get("/:id", protect, getOrderById);
+router.put("/:id/status", protect, adminOnly, updateOrderStatusValidation, validate, updateOrderStatus);
+router.delete("/:id", protect, cancelOrder);
+export default router;

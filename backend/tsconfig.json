@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "declaration": true,
+    "moduleDetection": "force",
+    "types": ["node", "express"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "src/tests"]
+}
