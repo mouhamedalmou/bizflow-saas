@@ -19,8 +19,10 @@ export const createProductValidation = [
     .isInt({ min: 0 })
     .withMessage("Stock must be zero or greater")
     .toInt(),
-  body("category").trim().notEmpty().withMessage("Category is required"),
-  body("image").optional().isString().withMessage("Image must be a string"),
+  body("category").isMongoId().withMessage("Valid category id is required"),
+  body("sku").trim().notEmpty().isLength({ max: 80 }).withMessage("SKU is required and cannot exceed 80 characters"),
+  body("imageUrl").optional().isURL({ protocols: ["https"], require_protocol: true }).withMessage("imageUrl must be a valid HTTPS URL"),
+  body("image").optional().isURL({ protocols: ["https"], require_protocol: true }).withMessage("Image must be a valid HTTPS URL"),
 ];
 
 export const updateProductValidation = [
@@ -46,9 +48,10 @@ export const updateProductValidation = [
     .toInt(),
   body("category")
     .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Category cannot be empty"),
+    .isMongoId()
+    .withMessage("Valid category id is required"),
+  body("sku").optional().trim().notEmpty().isLength({ max: 80 }).withMessage("SKU cannot be empty or exceed 80 characters"),
+  body("imageUrl").optional().isURL({ protocols: ["https"], require_protocol: true }).withMessage("imageUrl must be a valid HTTPS URL"),
   body("image").optional().isString().withMessage("Image must be a string"),
 ];
 

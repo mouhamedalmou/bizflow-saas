@@ -1,7 +1,7 @@
 import type { Document, Types } from "mongoose";
 
 export type UserRole = "admin" | "customer";
-export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "completed" | "cancelled";
+export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 export type PaymentStatus = "unpaid" | "paid" | "refunded";
 
 export interface IUser extends Document<Types.ObjectId> {
@@ -10,6 +10,7 @@ export interface IUser extends Document<Types.ObjectId> {
   email: string;
   password: string;
   name: string;
+  phone?: string;
   role: UserRole;
   avatar: string;
   isEmailVerified: boolean;
@@ -19,6 +20,9 @@ export interface IUser extends Document<Types.ObjectId> {
   passwordResetExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
+  comparePassword(password: string): Promise<boolean>;
+  generatePasswordReset(): string;
 }
 
 export interface IProduct extends Document<Types.ObjectId> {
@@ -28,12 +32,17 @@ export interface IProduct extends Document<Types.ObjectId> {
   description: string;
   price: number;
   stock: number;
-  category: string;
+  category: Types.ObjectId;
   imageUrl: string;
   image: string;
   sku: string;
+  createdBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
+  decreaseStock(quantity: number): Promise<void>;
+  increaseStock(quantity: number): Promise<void>;
+  isLowStock(): boolean;
 }
 
 export interface IOrderItem {
@@ -42,6 +51,7 @@ export interface IOrderItem {
   name: string;
   quantity: number;
   price: number;
+  priceAtTime: number;
 }
 
 export interface IOrder extends Document<Types.ObjectId> {
@@ -54,9 +64,17 @@ export interface IOrder extends Document<Types.ObjectId> {
   totalPrice: number;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
+  shippingAddress: { street: string; city: string; zip: string; country: string };
+  notes?: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
+  calculateTotal(): number;
+  updateStatus(newStatus: OrderStatus): Promise<void>;
+  getOrderTimeline(): OrderTimeline;
 }
+
+export interface OrderTimeline { status: OrderStatus; completed: OrderStatus[]; currentStep: number; updatedAt: Date }
 
 export interface ICategory extends Document<Types.ObjectId> {
   _id: Types.ObjectId;
@@ -65,14 +83,24 @@ export interface ICategory extends Document<Types.ObjectId> {
   description: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
+}
+
+export interface IDashboardStats extends Document<Types.ObjectId> {
+  totalRevenue: number;
+  totalOrders: number;
+  activeOrders: number;
+  lowStockProducts: number;
+  updatedAt: Date;
 }
 
 export interface RegisterDto { name: string; email: string; password: string }
 export interface LoginDto { email: string; password: string }
-export interface ProductDto { name: string; description: string; price: number; stock: number; category: string; image?: string; imageUrl?: string; sku?: string }
+export interface ProductDto { name: string; description: string; price: number; stock: number; category: string; image?: string; imageUrl?: string; sku?: string; createdBy?: string }
 export interface UpdateProductDto extends Partial<ProductDto> {}
 export interface CreateOrderItemDto { product: string; productId?: string; quantity: number }
-export interface CreateOrderDto { orderItems?: CreateOrderItemDto[]; items?: CreateOrderItemDto[] }
+export interface ShippingAddressDto { street: string; city: string; zip: string; country: string }
+export interface CreateOrderDto { orderItems?: CreateOrderItemDto[]; items?: CreateOrderItemDto[]; shippingAddress: ShippingAddressDto; notes?: string }
 export interface UpdateOrderStatusDto { status: OrderStatus }
 export interface PaginationQuery { page?: string; limit?: string; category?: string; search?: string }
 export interface RevenueQuery { period?: "day" | "week" | "month" }

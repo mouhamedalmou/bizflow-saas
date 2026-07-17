@@ -5,8 +5,9 @@ import ApiError from "../utils/apiError";
 import type { ApiResponse, IdParams, IProduct, PaginationQuery, ProductDto, UpdateProductDto } from "../types";
 
 export const createProduct = asyncHandler(async (req: Request<Record<string, never>, IProduct, ProductDto>, res: Response<IProduct>) => {
+  if (!req.user) throw new ApiError(401, "Not authenticated");
   const imageUrl = req.body.imageUrl ?? req.body.image ?? "";
-  const product = await Product.create({ ...req.body, image: imageUrl, imageUrl, sku: req.body.sku ?? `BF-${Date.now().toString(36).toUpperCase()}` });
+  const product = await Product.create({ ...req.body, image: imageUrl, imageUrl, createdBy: req.user._id, sku: req.body.sku ?? `BF-${Date.now().toString(36).toUpperCase()}` });
   res.status(201).json(product);
 });
 

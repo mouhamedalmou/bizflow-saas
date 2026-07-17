@@ -19,9 +19,9 @@ export const createOrder = asyncHandler(async (req: Request<Record<string, never
         const productId = requestedItem.productId ?? requestedItem.product;
         const product = await Product.findOneAndUpdate({ _id: productId, stock: { $gte: requestedItem.quantity } }, { $inc: { stock: -requestedItem.quantity } }, { new: true, session });
         if (!product) throw new ApiError(400, `Product unavailable or insufficient stock: ${productId}`);
-        const item: IOrderItem = { productId: product._id, product: product._id, name: product.name, quantity: requestedItem.quantity, price: product.price }; items.push(item); totalPrice += product.price * requestedItem.quantity;
+        const item: IOrderItem = { productId: product._id, product: product._id, name: product.name, quantity: requestedItem.quantity, price: product.price, priceAtTime: product.price }; items.push(item); totalPrice += product.price * requestedItem.quantity;
       }
-      [created] = await Order.create([{ userId: req.user?._id, user: req.user?._id, items, orderItems: items, totalPrice }], { session });
+      [created] = await Order.create([{ userId: req.user?._id, user: req.user?._id, items, orderItems: items, totalPrice, shippingAddress: req.body.shippingAddress, notes: req.body.notes }], { session });
     });
     if (!created) throw new ApiError(500, "Order creation failed"); res.status(201).json(created);
   } finally { await session.endSession(); }
