@@ -1,14 +1,14 @@
-const express = require("express");
-const {
+import express from "express";
+import {
   createInvoiceFromOrder,
   getAllInvoices,
   getMyInvoices,
-} = require("../controllers/invoiceController");
-const { protect, adminOnly } = require("../middleware/authMiddleware");
-const validateMiddleware = require("../middleware/validateMiddleware");
-const {
+} from "../controllers/invoiceController";
+import { protect, adminOnly } from "../middleware/authMiddleware";
+import validateMiddleware from "../middleware/validateMiddleware";
+import {
   createInvoiceFromOrderValidation,
-} = require("../validations/invoiceValidation");
+} from "../validations/invoiceValidation";
 
 const router = express.Router();
 
@@ -23,4 +23,4 @@ router.post(
   createInvoiceFromOrder
 );
 
-module.exports = router;
+export default router;

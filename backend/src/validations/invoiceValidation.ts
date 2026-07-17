@@ -1,9 +1,5 @@
-const { body } = require("express-validator");
+import { body } from "express-validator";
 
-const createInvoiceFromOrderValidation = [
+export const createInvoiceFromOrderValidation = [
   body("orderId").isMongoId().withMessage("Valid order id is required"),
 ];
-
-module.exports = {
-  createInvoiceFromOrderValidation,
-};

@@ -97,7 +97,7 @@ export interface IDashboardStats extends Document<Types.ObjectId> {
 export interface RegisterDto { name: string; email: string; password: string }
 export interface LoginDto { email: string; password: string }
 export interface ProductDto { name: string; description: string; price: number; stock: number; category: string; image?: string; imageUrl?: string; sku?: string; createdBy?: string }
-export interface UpdateProductDto extends Partial<ProductDto> {}
+export type UpdateProductDto = Partial<ProductDto>;
 export interface CreateOrderItemDto { product: string; productId?: string; quantity: number }
 export interface ShippingAddressDto { street: string; city: string; zip: string; country: string }
 export interface CreateOrderDto { orderItems?: CreateOrderItemDto[]; items?: CreateOrderItemDto[]; shippingAddress: ShippingAddressDto; notes?: string }

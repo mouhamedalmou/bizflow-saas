@@ -1,17 +1,34 @@
-FROM node:22-alpine
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
+RUN npm ci
 
-RUN npm ci --omit=dev
+COPY tsconfig.json ./
+COPY src ./src
 
-COPY . .
+RUN npm run type-check && npm run build
 
-ENV NODE_ENV=production
+FROM node:22-alpine AS runtime
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+COPY --from=builder --chown=node:node /app/dist ./dist
+
+ENV NODE_ENV=production \
+    PORT=5000 \
+    API_URL=https://bizflowsaas.duckdns.org/api \
+    CORS_ORIGIN=https://bizflowsaas.duckdns.org
 
 EXPOSE 5000
 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://127.0.0.1:5000/health',(response)=>process.exit(response.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+
 USER node
 
-CMD ["node", "src/server.js"]
+CMD ["node", "dist/server.js"]

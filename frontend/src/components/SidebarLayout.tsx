@@ -26,7 +26,6 @@ function SidebarContent({ user, onNavigate, onLogout }: SidebarContentProps) {
 export default function SidebarLayout() {
   const { user, logout } = useAuth(); const { isDark, toggleTheme } = useTheme(); const [sidebarOpen, setSidebarOpen] = useState(false); const [profileOpen, setProfileOpen] = useState(false); const profileRef = useRef<HTMLDivElement>(null); const navigate = useNavigate(); const location = useLocation(); const pageTitle = pageTitles[location.pathname] ?? "BizFlow";
   const handleLogout = (): void => { logout(); navigate("/login", { replace: true }); };
-  useEffect(() => { setSidebarOpen(false); setProfileOpen(false); }, [location.pathname]);
   useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") { setSidebarOpen(false); setProfileOpen(false); } }; document.addEventListener("keydown", close); document.body.style.overflow = sidebarOpen ? "hidden" : ""; return () => { document.removeEventListener("keydown", close); document.body.style.overflow = ""; }; }, [sidebarOpen]);
   useEffect(() => { const outside = (event: MouseEvent) => { if (!profileRef.current?.contains(event.target as Node)) setProfileOpen(false); }; document.addEventListener("mousedown", outside); return () => document.removeEventListener("mousedown", outside); }, []);
   return <div className="flex h-dvh overflow-hidden bg-slate-950 text-slate-100">

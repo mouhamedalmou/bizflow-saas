@@ -6,6 +6,7 @@ import ApiError from "../utils/apiError";
 
 export const notFound: RequestHandler = (req: Request, _res: Response, next: NextFunction): void => next(new ApiError(404, `Route not found: ${req.method} ${req.originalUrl}`));
 export const errorHandler: ErrorRequestHandler = (error: unknown, _req, res, _next): void => {
+  void _next;
   let statusCode = 500; let message = "Internal server error"; let errors: unknown[] = [];
   if (error instanceof ApiError) { statusCode = error.statusCode; message = error.message; errors = error.errors; }
   else if (error instanceof mongoose.Error.ValidationError) { statusCode = 400; message = "Validation failed"; errors = Object.values(error.errors).map((item) => ({ field: item.path, message: item.message })); }

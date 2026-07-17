@@ -13,6 +13,8 @@ build/
 .env
 .env.*
 !.env.example
+!backend/.env.prod
+!frontend/.env.prod
 
 # Logs
 *.log

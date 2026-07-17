@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+import { body, param } from "express-validator";
 
 export const userIdParam = [
   param("id").isMongoId().withMessage("Valid user id is required"),
@@ -16,8 +16,3 @@ export const updateUserValidation = [
     .isIn(["customer", "admin"])
     .withMessage("Role must be customer or admin"),
 ];
-
-module.exports = {
-  userIdParam,
-  updateUserValidation,
-};

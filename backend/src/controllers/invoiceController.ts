@@ -1,7 +1,7 @@
-const Invoice = require("../models/Invoice");
-const Order = require("../models/Order");
-const asyncHandler = require("../utils/asyncHandler");
-const ApiError = require("../utils/apiError");
+import Invoice from "../models/Invoice";
+import Order from "../models/Order";
+import asyncHandler from "../utils/asyncHandler";
+import ApiError from "../utils/apiError";
 import type { Request, Response } from "express";
 import type { IOrderItem } from "../types";
 
@@ -18,7 +18,7 @@ const createInvoiceNumber = () => {
 // @desc    Create invoice from order
 // @route   POST /api/invoices/from-order
 // @access  Admin
-const createInvoiceFromOrder = asyncHandler(async (req: Request, res: Response) => {
+export const createInvoiceFromOrder = asyncHandler(async (req: Request, res: Response) => {
   const { orderId } = req.body;
 
   const order = await Order.findById(orderId).populate("user", "name email role");
@@ -56,7 +56,7 @@ const createInvoiceFromOrder = asyncHandler(async (req: Request, res: Response) 
 // @desc    Get all invoices
 // @route   GET /api/invoices
 // @access  Admin
-const getAllInvoices = asyncHandler(async (_req: Request, res: Response) => {
+export const getAllInvoices = asyncHandler(async (_req: Request, res: Response) => {
   const invoices = await Invoice.find()
     .populate("user", "name email role")
     .populate("order")
@@ -68,7 +68,7 @@ const getAllInvoices = asyncHandler(async (_req: Request, res: Response) => {
 // @desc    Get logged user invoices
 // @route   GET /api/invoices/my-invoices
 // @access  Customer/Admin
-const getMyInvoices = asyncHandler(async (req: Request, res: Response) => {
+export const getMyInvoices = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw new ApiError(401, "Not authenticated");
   const invoices = await Invoice.find({ user: req.user._id })
     .populate("order")
@@ -76,9 +76,3 @@ const getMyInvoices = asyncHandler(async (req: Request, res: Response) => {
 
   res.json(invoices);
 });
-
-module.exports = {
-  createInvoiceFromOrder,
-  getAllInvoices,
-  getMyInvoices,
-};

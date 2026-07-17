@@ -1,17 +1,17 @@
-const express = require("express");
-const {
+import express from "express";
+import {
   getSubscriptionPlans,
   createSubscription,
   getMySubscription,
   getAllSubscriptions,
   updateSubscriptionStatus,
-} = require("../controllers/subscriptionController");
-const { protect, adminOnly } = require("../middleware/authMiddleware");
-const validateMiddleware = require("../middleware/validateMiddleware");
-const {
+} from "../controllers/subscriptionController";
+import { protect, adminOnly } from "../middleware/authMiddleware";
+import validateMiddleware from "../middleware/validateMiddleware";
+import {
   createSubscriptionValidation,
   updateSubscriptionStatusValidation,
-} = require("../validations/subscriptionValidation");
+} from "../validations/subscriptionValidation";
 
 const router = express.Router();
 
@@ -32,4 +32,4 @@ router.put(
   updateSubscriptionStatus
 );
 
-module.exports = router;
+export default router;

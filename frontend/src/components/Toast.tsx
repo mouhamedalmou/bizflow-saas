@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- provider module intentionally exports its typed hook */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from "lucide-react";
 export type ToastType = "success" | "error" | "warning" | "info";

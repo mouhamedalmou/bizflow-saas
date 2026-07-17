@@ -1,4 +1,12 @@
-const plans = [
+interface SubscriptionPlan {
+  code: string;
+  name: string;
+  price: number;
+  interval: "month" | "year";
+  features: string[];
+}
+
+const plans: SubscriptionPlan[] = [
   {
     code: "starter",
     name: "Starter",
@@ -22,13 +30,8 @@ const plans = [
   },
 ];
 
-const getPlans = () => plans;
+export const getPlans = () => plans;
 
-const getPlanByCode = (code: string) => {
+export const getPlanByCode = (code: string) => {
   return plans.find((plan) => plan.code === String(code).toLowerCase());
-};
-
-module.exports = {
-  getPlans,
-  getPlanByCode,
 };

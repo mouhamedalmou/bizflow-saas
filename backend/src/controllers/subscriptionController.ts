@@ -1,10 +1,7 @@
-const Subscription = require("../models/Subscription");
-const asyncHandler = require("../utils/asyncHandler");
-const ApiError = require("../utils/apiError");
-const {
-  getPlans,
-  getPlanByCode,
-} = require("../services/subscriptionPlans");
+import Subscription from "../models/Subscription";
+import asyncHandler from "../utils/asyncHandler";
+import ApiError from "../utils/apiError";
+import { getPlanByCode, getPlans } from "../services/subscriptionPlans";
 import type { Request, Response } from "express";
 
 const getPeriodEnd = (interval: "month" | "year"): Date => {
@@ -22,14 +19,14 @@ const getPeriodEnd = (interval: "month" | "year"): Date => {
 // @desc    Get available plans
 // @route   GET /api/subscriptions/plans
 // @access  Public
-const getSubscriptionPlans = asyncHandler(async (_req: Request, res: Response) => {
+export const getSubscriptionPlans = asyncHandler(async (_req: Request, res: Response) => {
   res.json(getPlans());
 });
 
 // @desc    Create or update user subscription
 // @route   POST /api/subscriptions
 // @access  Customer/Admin
-const createSubscription = asyncHandler(async (req: Request, res: Response) => {
+export const createSubscription = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw new ApiError(401, "Not authenticated");
   const plan = getPlanByCode(req.body.planCode);
 
@@ -43,7 +40,7 @@ const createSubscription = asyncHandler(async (req: Request, res: Response) => {
     planName: plan.name,
     price: plan.price,
     interval: plan.interval,
-    status: "active",
+    status: "active" as const,
     currentPeriodStart: new Date(),
     currentPeriodEnd: getPeriodEnd(plan.interval),
   };
@@ -64,7 +61,7 @@ const createSubscription = asyncHandler(async (req: Request, res: Response) => {
 // @desc    Get logged user subscription
 // @route   GET /api/subscriptions/my-subscription
 // @access  Customer/Admin
-const getMySubscription = asyncHandler(async (req: Request, res: Response) => {
+export const getMySubscription = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw new ApiError(401, "Not authenticated");
   const subscription = await Subscription.findOne({
     user: req.user._id,
@@ -76,7 +73,7 @@ const getMySubscription = asyncHandler(async (req: Request, res: Response) => {
 // @desc    Get all subscriptions
 // @route   GET /api/subscriptions
 // @access  Admin
-const getAllSubscriptions = asyncHandler(async (_req: Request, res: Response) => {
+export const getAllSubscriptions = asyncHandler(async (_req: Request, res: Response) => {
   const subscriptions = await Subscription.find()
     .populate("user", "name email role")
     .sort({ createdAt: -1 });
@@ -87,7 +84,7 @@ const getAllSubscriptions = asyncHandler(async (_req: Request, res: Response) =>
 // @desc    Update subscription status
 // @route   PUT /api/subscriptions/:id/status
 // @access  Admin
-const updateSubscriptionStatus = asyncHandler(async (req: Request, res: Response) => {
+export const updateSubscriptionStatus = asyncHandler(async (req: Request, res: Response) => {
   const subscription = await Subscription.findById(req.params.id);
 
   if (!subscription) {
@@ -104,11 +101,3 @@ const updateSubscriptionStatus = asyncHandler(async (req: Request, res: Response
 
   res.json(updatedSubscription);
 });
-
-module.exports = {
-  getSubscriptionPlans,
-  createSubscription,
-  getMySubscription,
-  getAllSubscriptions,
-  updateSubscriptionStatus,
-};

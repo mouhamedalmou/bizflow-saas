@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+import { body, param } from "express-validator";
 
 export const productIdParam = [
   param("id").isMongoId().withMessage("Valid product id is required"),
@@ -54,9 +54,3 @@ export const updateProductValidation = [
   body("imageUrl").optional().isURL({ protocols: ["https"], require_protocol: true }).withMessage("imageUrl must be a valid HTTPS URL"),
   body("image").optional().isString().withMessage("Image must be a string"),
 ];
-
-module.exports = {
-  productIdParam,
-  createProductValidation,
-  updateProductValidation,
-};

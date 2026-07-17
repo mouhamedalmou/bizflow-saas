@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+import { body, param } from "express-validator";
 
 export const createOrderValidation = [
   body("orderItems")
@@ -24,8 +24,3 @@ export const updateOrderStatusValidation = [
     .isIn(["pending", "processing", "shipped", "delivered", "cancelled"])
     .withMessage("Invalid order status"),
 ];
-
-module.exports = {
-  createOrderValidation,
-  updateOrderStatusValidation,
-};
