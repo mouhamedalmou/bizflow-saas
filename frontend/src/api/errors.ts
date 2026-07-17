@@ -13,7 +13,13 @@ export function normalizeApiError(error: unknown, fallback = "Si è verificato u
   if (error instanceof ApiClientError) return error;
   if (!axios.isAxiosError<ApiErrorBody>(error)) return new ApiClientError(error instanceof Error ? error.message : fallback, 0);
   const status = error.response?.status ?? 0;
-  const message = error.response?.data?.message ?? error.response?.data?.error ?? (error.code === "ECONNABORTED" ? "La richiesta ha impiegato troppo tempo." : fallbackByStatus[status] ?? fallback);
+  const message = error.response?.data?.message
+    ?? error.response?.data?.error
+    ?? (error.code === "ECONNABORTED"
+      ? "La richiesta ha impiegato troppo tempo."
+      : error.code === "ERR_NETWORK"
+        ? "Backend non raggiungibile. Verifica che il server API sia avviato."
+        : fallbackByStatus[status] ?? fallback);
   if (status === 401 || status === 403) return new UnauthorizedError(message, status);
   if (status === 404) return new NotFoundError(message);
   if (status === 400 || status === 409 || status === 422) return new ValidationError(message, error.response?.data);

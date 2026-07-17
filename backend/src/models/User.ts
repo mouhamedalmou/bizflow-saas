@@ -5,12 +5,12 @@ import type { IUser } from "../types";
 
 /** Persistent BizFlow user with authentication helper methods. */
 const userSchema = new Schema<IUser>({
-  email: { type: String, required: [true, "Email is required"], unique: true, lowercase: true, trim: true, maxlength: 254, match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"] },
+  email: { type: String, required: [true, "Email is required"], unique: true, index: true, lowercase: true, trim: true, maxlength: 254, match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"] },
   password: { type: String, required: [true, "Password is required"], minlength: 6, maxlength: 128, select: false },
-  name: { type: String, required: [true, "Name is required"], trim: true, minlength: 2, maxlength: 100 },
+  name: { type: String, required: [true, "Name is required"], index: true, trim: true, minlength: 2, maxlength: 100 },
   phone: { type: String, trim: true, maxlength: 30 },
   avatar: { type: String, trim: true, maxlength: 2048, match: [/^https?:\/\//i, "Avatar must be a valid URL"] },
-  role: { type: String, enum: ["customer", "admin"], default: "customer", index: true },
+  role: { type: String, enum: ["customer", "admin"], default: "customer" },
   isEmailVerified: { type: Boolean, default: false },
   emailVerificationToken: { type: String, select: false }, emailVerificationExpires: { type: Date, select: false },
   passwordResetToken: { type: String, select: false }, passwordResetExpires: { type: Date, select: false },
@@ -23,7 +23,6 @@ userSchema.pre("save", async function hashPassword(): Promise<void> { if (this.i
 userSchema.methods.comparePassword = function comparePassword(password: string): Promise<boolean> { return bcrypt.compare(password, this.password); };
 /** Generates a reset token and stores only its SHA-256 digest for 15 minutes. */
 userSchema.methods.generatePasswordReset = function generatePasswordReset(): string { const token = crypto.randomBytes(32).toString("hex"); this.passwordResetToken = crypto.createHash("sha256").update(token).digest("hex"); this.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000); return token; };
-userSchema.index({ email: 1 }, { unique: true });
 userSchema.pre(["find", "findOne", "findOneAndUpdate"], function excludeDeleted() { this.where({ deletedAt: null }); });
 
 export default model<IUser>("User", userSchema);

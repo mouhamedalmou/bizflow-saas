@@ -11,9 +11,9 @@ const addressSchema = new Schema({ street: { type: String, required: true, trim:
 
 /** Customer order with immutable price snapshots and workflow helpers. */
 const orderSchema = new Schema<IOrder>({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true }, user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   items: { type: [itemSchema], required: true, validate: { validator: (items: IOrderItem[]) => items.length > 0, message: "Order requires at least one item" } }, orderItems: { type: [itemSchema], required: true },
-  totalPrice: { type: Number, required: true, min: 0 }, status: { type: String, enum: ["pending", "processing", "shipped", "delivered", "cancelled"], default: "pending" },
+  totalPrice: { type: Number, required: true, min: 0 }, status: { type: String, enum: ["pending", "processing", "shipped", "delivered", "cancelled"], default: "pending", index: true },
   shippingAddress: { type: addressSchema, required: true }, notes: { type: String, trim: true, maxlength: 1000 }, paymentStatus: { type: String, enum: ["unpaid", "paid", "refunded"], default: "unpaid" },
   deletedAt: { type: Date, default: null, select: false },
 }, { timestamps: true, optimisticConcurrency: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
@@ -26,6 +26,6 @@ orderSchema.methods.updateStatus = async function updateStatus(this: IOrder, new
 orderSchema.methods.getOrderTimeline = function getOrderTimeline(): OrderTimeline { const flow: OrderStatus[] = ["pending", "processing", "shipped", "delivered"]; const currentStep = this.status === "cancelled" ? -1 : flow.indexOf(this.status); return { status: this.status, completed: currentStep < 0 ? [] : flow.slice(0, currentStep + 1), currentStep, updatedAt: this.updatedAt }; };
 orderSchema.pre("validate", function normalizeOrder(): void { this.items ??= []; this.orderItems ??= []; if (this.items.length && !this.orderItems.length) this.orderItems = this.items; if (this.orderItems.length && !this.items.length) this.items = this.orderItems; for (const item of this.items) { item.product ||= item.productId; item.productId ||= item.product; item.priceAtTime ??= item.price; item.price ??= item.priceAtTime; } this.totalPrice = this.calculateTotal(); if (this.userId && !this.user) this.user = this.userId; });
 orderSchema.pre(["find", "findOne", "findOneAndUpdate"], function populateReferences() { this.where({ deletedAt: null }).populate("userId", "name email avatar").populate("items.productId", "name sku imageUrl"); });
-orderSchema.index({ userId: 1, createdAt: -1 }); orderSchema.index({ status: 1 }); orderSchema.index({ createdAt: -1 });
+orderSchema.index({ userId: 1, createdAt: -1 });
 
 export default model<IOrder>("Order", orderSchema);

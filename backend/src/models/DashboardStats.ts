@@ -9,5 +9,4 @@ const dashboardStatsSchema = new Schema<IDashboardStats>({
   lowStockProducts: { type: Number, min: 0, default: 0 },
 }, { timestamps: { createdAt: false, updatedAt: true }, versionKey: false });
 
-dashboardStatsSchema.index({ updatedAt: -1 });
 export default model<IDashboardStats>("DashboardStats", dashboardStatsSchema);
