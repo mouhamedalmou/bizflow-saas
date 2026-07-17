@@ -9,6 +9,7 @@ import {
   getProductDescription,
   getProductName,
 } from "../utils/productDisplay";
+import { categoryName } from "../types";
 
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -116,7 +117,7 @@ const Products = () => {
                   {getProductName(product)}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  {product.category}
+                  {categoryName(product.category)}
                 </p>
               </div>
               <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">

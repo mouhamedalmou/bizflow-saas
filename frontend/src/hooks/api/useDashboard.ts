@@ -1,0 +1,10 @@
+import { useCallback } from "react";
+import api from "../../api/axios";
+import type { ApiEnvelope, ChartData, DashboardStats, TopProduct, TrendData } from "../../types";
+import { useQuery } from "./useQuery";
+
+const unwrap = <T>(payload: T | ApiEnvelope<T>): T => typeof payload === "object" && payload !== null && "data" in payload ? payload.data : payload;
+export function useDashboardStats() { const fetcher = useCallback(async () => { const { data } = await api.get<DashboardStats | ApiEnvelope<DashboardStats>>("/dashboard/stats"); return unwrap(data); }, []); const query = useQuery("dashboard:stats", fetcher, { refreshInterval: 30_000 }); return { stats: query.data, loading: query.loading, error: query.error, refetch: query.refetch }; }
+export function useRevenueChart(period: "day" | "week" | "month") { const fetcher = useCallback(async () => { const { data } = await api.get<ChartData[] | ApiEnvelope<ChartData[]>>("/dashboard/revenue", { params: { period } }); return unwrap(data); }, [period]); const query = useQuery(`dashboard:revenue:${period}`, fetcher, { refreshInterval: 60_000 }); return { data: query.data ?? [], loading: query.loading, error: query.error, refetch: query.refetch }; }
+export function useOrdersTrend() { const fetcher = useCallback(async () => { const { data } = await api.get<TrendData[] | ApiEnvelope<TrendData[]>>("/dashboard/orders-trend"); return unwrap(data); }, []); const query = useQuery("dashboard:orders-trend", fetcher, { refreshInterval: 60_000 }); return { data: query.data ?? [], loading: query.loading, error: query.error, refetch: query.refetch }; }
+export function useTopProducts() { const fetcher = useCallback(async () => { const { data } = await api.get<TopProduct[] | ApiEnvelope<TopProduct[]>>("/dashboard/top-products"); return unwrap(data); }, []); const query = useQuery("dashboard:top-products", fetcher, { refreshInterval: 60_000 }); return { products: query.data ?? [], loading: query.loading, error: query.error, refetch: query.refetch }; }

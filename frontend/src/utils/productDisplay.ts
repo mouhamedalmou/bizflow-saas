@@ -1,4 +1,4 @@
-import type { Product } from "../types";
+import { categoryName, type Product } from "../types";
 
 const isUrl = (value: unknown): value is string => {
   return typeof value === "string" && /^https?:\/\//i.test(value.trim());
@@ -28,7 +28,7 @@ export const getProductName = (product: Partial<Product>): string => {
   return (
     getNameFromUrl(product?.image) ||
     getNameFromUrl(product?.name) ||
-    product?.category ||
+    (product.category ? categoryName(product.category) : "") ||
     "Product"
   );
 };

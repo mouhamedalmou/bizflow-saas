@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import api from "../api/axios";
 import { getApiErrorMessage } from "../api/axios";
 import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
-import type { Product } from "../types";
+import { categoryName, type Product } from "../types";
 import EditProductModal from "../components/EditProductModal";
 import Loader from "../components/Loader";
 import ProductImage from "../components/ProductImage";
@@ -424,7 +424,7 @@ const AdminProducts = () => {
                       </p>
                     </td>
                     <td className="px-4 py-3 text-slate-700">
-                      <span className="line-clamp-2">{product.category}</span>
+                      <span className="line-clamp-2">{categoryName(product.category)}</span>
                     </td>
                     <td className="px-4 py-3 font-medium text-slate-950">
                       {formatCurrency(product.price)}

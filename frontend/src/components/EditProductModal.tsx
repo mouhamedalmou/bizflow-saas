@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import api from "../api/axios";
 import { getApiErrorMessage } from "../api/axios";
 import type { ChangeEvent, FormEvent } from "react";
-import type { Product } from "../types";
+import { categoryId, type Product } from "../types";
 import ProductImage from "./ProductImage";
 import { getProductName } from "../utils/productDisplay";
 
@@ -17,7 +17,7 @@ const buildInitialForm = (product: Product): ProductForm => ({
   description: product.description || "",
   price: String(product.price ?? ""),
   stock: String(product.stock ?? ""),
-  category: product.category || "",
+  category: categoryId(product.category),
   image: product.image || "",
 });
 
