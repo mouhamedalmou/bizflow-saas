@@ -1,7 +1,9 @@
 import { useState } from "react";
 
-const ProductImage = ({ src, alt, className = "" }) => {
-  const [hasError, setHasError] = useState(false);
+interface ProductImageProps { src?: string; alt: string; className?: string }
+
+const ProductImage = ({ src, alt, className = "" }: ProductImageProps) => {
+  const [hasError, setHasError] = useState<boolean>(false);
   const shouldShowImage = src && !hasError;
 
   return (

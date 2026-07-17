@@ -1,34 +1,40 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
+import { getApiErrorMessage } from "../api/axios";
+import type { ChangeEvent, FormEvent } from "react";
+import type { Product } from "../types";
 import ProductImage from "./ProductImage";
 import { getProductName } from "../utils/productDisplay";
 
 const maxImageSize = 5 * 1024 * 1024;
 
-const buildInitialForm = (product) => ({
+interface ProductForm { name: string; description: string; price: string; stock: string; category: string; image: string }
+interface EditProductModalProps { product: Product; onClose: () => void; onUpdated: (product: Product) => void }
+
+const buildInitialForm = (product: Product): ProductForm => ({
   name: product.name || "",
   description: product.description || "",
-  price: product.price ?? "",
-  stock: product.stock ?? "",
+  price: String(product.price ?? ""),
+  stock: String(product.stock ?? ""),
   category: product.category || "",
   image: product.image || "",
 });
 
-const EditProductModal = ({ product, onClose, onUpdated }) => {
+const EditProductModal = ({ product, onClose, onUpdated }: EditProductModalProps) => {
   const [formData, setFormData] = useState(() => buildInitialForm(product));
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadInputKey, setUploadInputKey] = useState(0);
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((current) => ({
       ...current,
       [event.target.name]: event.target.value,
     }));
   };
 
-  const uploadImageHandler = async (event) => {
+  const uploadImageHandler = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -70,14 +76,14 @@ const EditProductModal = ({ product, onClose, onUpdated }) => {
       setUploadInputKey((currentKey) => currentKey + 1);
       toast.success("Image uploaded successfully.");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Image upload failed.");
+      toast.error(getApiErrorMessage(err, "Image upload failed."));
       event.target.value = "";
     } finally {
       setUploading(false);
     }
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
 
     if (uploading) {
@@ -94,14 +100,11 @@ const EditProductModal = ({ product, onClose, onUpdated }) => {
     };
 
     try {
-      const { data } = await api.put(`/products/${product._id}`, payload);
+      const { data } = await api.put<Product>(`/products/${product._id}`, payload);
       toast.success(`${getProductName(data)} updated successfully.`);
       onUpdated(data);
     } catch (err) {
-      const message =
-        err.response?.data?.errors?.[0]?.message ||
-        err.response?.data?.message ||
-        "Unable to update product";
+      const message = getApiErrorMessage(err, "Unable to update product");
 
       toast.error(message);
     } finally {
@@ -240,7 +243,7 @@ const EditProductModal = ({ product, onClose, onUpdated }) => {
                   value={formData.description}
                   onChange={handleChange}
                   required
-                  rows="5"
+                  rows={5}
                   className="w-full resize-none rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-blue-950"
                 />
               </div>

@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
+import type { ChangeEvent, FormEvent } from "react";
+import type { User } from "../types";
+import { getApiErrorMessage } from "../api/axios";
 
 const Login = () => {
   const { user, setUser } = useAuth();
@@ -20,27 +23,27 @@ const Login = () => {
     }
   }, [navigate, user]);
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFormData((current) => ({
       ...current,
       [event.target.name]: event.target.value,
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const { data } = await api.post("/auth/login", formData);
+      const { data } = await api.post<User>("/auth/login", formData);
 
       setUser(data);
       navigate(location.state?.from?.pathname || "/dashboard", {
         replace: true,
       });
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      setError(getApiErrorMessage(err, "Login failed"));
     } finally {
       setLoading(false);
     }

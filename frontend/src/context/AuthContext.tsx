@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { AuthContext } from "./authContextCore";
+import type { ChildrenProps, User } from "../types";
 
-const getStoredUser = () => {
+const getStoredUser = (): User | null => {
   const storedUser = localStorage.getItem("user");
 
   if (!storedUser) {
@@ -9,7 +10,7 @@ const getStoredUser = () => {
   }
 
   try {
-    const user = JSON.parse(storedUser);
+    const user = JSON.parse(storedUser) as User;
 
     if (!user?.token) {
       localStorage.removeItem("user");
@@ -23,9 +24,9 @@ const getStoredUser = () => {
   }
 };
 
-export const AuthProvider = ({ children }) => {
-  const [user, setCurrentUser] = useState(getStoredUser);
-  const [loading] = useState(false);
+export const AuthProvider = ({ children }: ChildrenProps) => {
+  const [user, setCurrentUser] = useState<User | null>(getStoredUser);
+  const [loading] = useState<boolean>(false);
 
   useEffect(() => {
     const handleAuthExpired = () => {
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const setUser = (nextUser) => {
+  const setUser = (nextUser: User | null): void => {
     if (!nextUser?.token) {
       localStorage.removeItem("user");
       setCurrentUser(null);
@@ -60,6 +61,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        isAuthenticated: Boolean(user),
         setUser,
         logout,
         loading,

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
+import { getApiErrorMessage } from "../api/axios";
+import type { Product } from "../types";
 import Loader from "../components/Loader";
 import ProductImage from "../components/ProductImage";
 import {
@@ -8,7 +10,7 @@ import {
   getProductName,
 } from "../utils/productDisplay";
 
-const formatCurrency = (value) => {
+const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -16,10 +18,10 @@ const formatCurrency = (value) => {
 };
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [orderingId, setOrderingId] = useState(null);
-  const [error, setError] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [orderingId, setOrderingId] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -27,10 +29,10 @@ const Products = () => {
       setLoading(true);
 
       try {
-        const { data } = await api.get("/products");
+        const { data } = await api.get<Product[]>("/products");
         setProducts(data);
       } catch (err) {
-        setError(err.response?.data?.message || "Unable to load products");
+        setError(getApiErrorMessage(err, "Unable to load products"));
       } finally {
         setLoading(false);
       }
@@ -39,7 +41,7 @@ const Products = () => {
     fetchProducts();
   }, []);
 
-  const handleOrderNow = async (product) => {
+  const handleOrderNow = async (product: Product): Promise<void> => {
     if (product.stock < 1) {
       toast.error("This product is out of stock.");
       return;
@@ -69,10 +71,7 @@ const Products = () => {
       );
       toast.success(`${getProductName(product)} ordered successfully.`);
     } catch (err) {
-      const message =
-        err.response?.data?.errors?.[0]?.message ||
-        err.response?.data?.message ||
-        "Unable to create order";
+      const message = getApiErrorMessage(err, "Unable to create order");
 
       toast.error(message);
     } finally {

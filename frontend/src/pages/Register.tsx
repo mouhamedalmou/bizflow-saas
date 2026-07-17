@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
+import type { ChangeEvent, FormEvent } from "react";
+import type { ApiMessage } from "../types";
+import { getApiErrorMessage } from "../api/axios";
 
 const Register = () => {
   const { user } = useAuth();
@@ -21,21 +24,21 @@ const Register = () => {
     }
   }, [navigate, user]);
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFormData((current) => ({
       ...current,
       [event.target.name]: event.target.value,
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setError("");
     setSuccess("");
     setLoading(true);
 
     try {
-      const { data } = await api.post("/auth/register", formData);
+      const { data } = await api.post<ApiMessage>("/auth/register", formData);
 
       setSuccess(data.message || "Account created. Please verify your email.");
       setFormData({
@@ -44,10 +47,7 @@ const Register = () => {
         password: "",
       });
     } catch (err) {
-      const message =
-        err.response?.data?.errors?.[0]?.message ||
-        err.response?.data?.message ||
-        "Registration failed";
+      const message = getApiErrorMessage(err, "Registration failed");
 
       setError(message);
     } finally {

@@ -18,8 +18,10 @@ import api from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 import Loader from "../components/Loader";
+import type { DashboardStats, Order, OrderStatus } from "../types";
+import { getApiErrorMessage } from "../api/axios";
 
-const formatCurrency = (value) => {
+const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -29,9 +31,9 @@ const formatCurrency = (value) => {
 const Dashboard = () => {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const [stats, setStats] = useState(null);
-  const [recentOrders, setRecentOrders] = useState([]);
-  const [myOrders, setMyOrders] = useState([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [myOrders, setMyOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -47,22 +49,18 @@ const Dashboard = () => {
       try {
         if (user?.role === "admin") {
           const [statsResponse, recentOrdersResponse] = await Promise.all([
-            api.get("/dashboard/stats"),
-            api.get("/dashboard/recent-orders"),
+            api.get<DashboardStats>("/dashboard/stats"),
+            api.get<Order[]>("/dashboard/recent-orders"),
           ]);
 
           setStats(statsResponse.data);
           setRecentOrders(recentOrdersResponse.data);
         } else {
-          const { data } = await api.get("/orders/my-orders");
+          const { data } = await api.get<Order[]>("/orders/my-orders");
           setMyOrders(data);
         }
       } catch (err) {
-        if (err.response?.status === 401) {
-          return;
-        }
-
-        setError(err.response?.data?.message || "Unable to load dashboard");
+        setError(getApiErrorMessage(err, "Unable to load dashboard"));
       } finally {
         setLoading(false);
       }
@@ -87,11 +85,13 @@ const Dashboard = () => {
     borderRadius: "8px",
     color: isDark ? "#e2e8f0" : "#0f172a",
   };
-  const statusColors = {
+  const statusColors: Record<OrderStatus, string> = {
     pending: "#f59e0b",
     processing: "#3b82f6",
     shipped: "#6366f1",
     delivered: "#10b981",
+    completed: "#10b981",
+    cancelled: "#ef4444",
   };
 
   return (
@@ -147,7 +147,7 @@ const Dashboard = () => {
             <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
               <p className="text-sm text-slate-500">Revenue</p>
               <p className="mt-2 text-xl font-bold text-slate-950">
-                {formatCurrency(stats?.totalRevenue)}
+                {formatCurrency(stats?.totalRevenue ?? 0)}
               </p>
             </div>
           </div>
@@ -164,7 +164,7 @@ const Dashboard = () => {
                   </p>
                 </div>
                 <p className="text-sm font-semibold text-slate-950">
-                  {formatCurrency(stats?.totalRevenue)}
+                  {formatCurrency(stats?.totalRevenue ?? 0)}
                 </p>
               </div>
 
@@ -210,7 +210,7 @@ const Dashboard = () => {
                     />
                     <Tooltip
                       contentStyle={chartTooltipStyle}
-                      formatter={(value) => [formatCurrency(value), "Revenue"]}
+                      formatter={(value) => [formatCurrency(Number(value ?? 0)), "Revenue"]}
                     />
                     <Area
                       type="monotone"

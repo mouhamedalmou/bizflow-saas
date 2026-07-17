@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../api/axios";
+import { getApiErrorMessage } from "../api/axios";
+import type { ChangeEvent, FormEvent } from "react";
+import type { ApiMessage } from "../types";
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -12,14 +15,14 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFormData((current) => ({
       ...current,
       [event.target.name]: event.target.value,
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setError("");
     setSuccess("");
@@ -37,7 +40,7 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-      const { data } = await api.post(`/auth/reset-password/${token}`, {
+      const { data } = await api.post<ApiMessage>(`/auth/reset-password/${token}`, {
         password: formData.password,
       });
 
@@ -47,10 +50,7 @@ const ResetPassword = () => {
         confirmPassword: "",
       });
     } catch (err) {
-      const message =
-        err.response?.data?.errors?.[0]?.message ||
-        err.response?.data?.message ||
-        "Unable to reset password";
+      const message = getApiErrorMessage(err, "Unable to reset password");
 
       setError(message);
     } finally {

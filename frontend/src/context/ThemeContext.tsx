@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { ThemeContext } from "./themeContextCore";
+import type { ChildrenProps, ThemeContextValue } from "../types";
 
-const getInitialTheme = () => {
+const getInitialTheme = (): "light" | "dark" => {
   const storedTheme = localStorage.getItem("theme");
 
   if (storedTheme === "dark" || storedTheme === "light") {
@@ -13,8 +14,8 @@ const getInitialTheme = () => {
   return prefersDark ? "dark" : "light";
 };
 
-export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(getInitialTheme);
+export const ThemeProvider = ({ children }: ChildrenProps) => {
+  const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
   const isDark = theme === "dark";
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem("theme", theme);
   }, [isDark, theme]);
 
-  const value = useMemo(
+  const value = useMemo<ThemeContextValue>(
     () => ({
       theme,
       isDark,

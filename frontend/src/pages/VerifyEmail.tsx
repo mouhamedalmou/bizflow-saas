@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../api/axios";
+import { getApiErrorMessage } from "../api/axios";
+import type { ApiMessage } from "../types";
 
 const VerifyEmail = () => {
   const { token } = useParams();
-  const [status, setStatus] = useState("loading");
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("Verifying your email address...");
 
   useEffect(() => {
@@ -18,7 +20,7 @@ const VerifyEmail = () => {
       }
 
       try {
-        const { data } = await api.get(`/auth/verify-email/${token}`);
+        const { data } = await api.get<ApiMessage>(`/auth/verify-email/${token}`);
 
         if (isMounted) {
           setStatus("success");
@@ -27,10 +29,7 @@ const VerifyEmail = () => {
       } catch (err) {
         if (isMounted) {
           setStatus("error");
-          setMessage(
-            err.response?.data?.message ||
-              "Invalid or expired verification link."
-          );
+          setMessage(getApiErrorMessage(err, "Invalid or expired verification link."));
         }
       }
     };

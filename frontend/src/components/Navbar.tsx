@@ -1,8 +1,9 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
+import type { NavLinkRenderProps } from "react-router-dom";
 
-const navLinkClass = ({ isActive }) =>
+const navLinkClass = ({ isActive }: NavLinkRenderProps): string =>
   [
     "rounded-md px-3 py-2 text-sm font-medium transition",
     isActive

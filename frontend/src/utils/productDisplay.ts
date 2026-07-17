@@ -1,8 +1,11 @@
-const isUrl = (value) => {
+import type { Product } from "../types";
+
+const isUrl = (value: unknown): value is string => {
   return typeof value === "string" && /^https?:\/\//i.test(value.trim());
 };
 
-const getNameFromUrl = (value) => {
+const getNameFromUrl = (value: string | undefined): string => {
+  if (!value) return "";
   try {
     const url = new URL(value);
     const fileName = url.pathname.split("/").filter(Boolean).pop() || "";
@@ -17,7 +20,7 @@ const getNameFromUrl = (value) => {
   }
 };
 
-export const getProductName = (product) => {
+export const getProductName = (product: Partial<Product>): string => {
   if (!isUrl(product?.name) && product?.name) {
     return product.name;
   }
@@ -30,7 +33,7 @@ export const getProductName = (product) => {
   );
 };
 
-export const getProductDescription = (description) => {
+export const getProductDescription = (description?: string): string => {
   if (!description || isUrl(description)) {
     return "No description available.";
   }

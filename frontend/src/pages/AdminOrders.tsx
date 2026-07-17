@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import Loader from "../components/Loader";
+import type { Order, OrderStatus } from "../types";
+import { getApiErrorMessage } from "../api/axios";
 
-const orderStatuses = ["pending", "processing", "shipped", "delivered"];
+const orderStatuses: OrderStatus[] = ["pending", "processing", "shipped", "delivered"];
 
-const formatCurrency = (value) => {
+const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   }).format(value || 0);
 };
 
-const formatDate = (value) => {
+const formatDate = (value: string): string => {
   if (!value) {
     return "No date";
   }
@@ -24,7 +26,7 @@ const formatDate = (value) => {
   }).format(new Date(value));
 };
 
-const statusStyles = {
+const statusStyles: Record<OrderStatus, string> = {
   pending: "bg-amber-50 text-amber-700 border-amber-200",
   processing: "bg-blue-50 text-blue-700 border-blue-200",
   shipped: "bg-indigo-50 text-indigo-700 border-indigo-200",
@@ -33,11 +35,11 @@ const statusStyles = {
   cancelled: "bg-red-50 text-red-700 border-red-200",
 };
 
-const getStatusClass = (status) => {
+const getStatusClass = (status: OrderStatus): string => {
   return statusStyles[status] || "bg-slate-50 text-slate-700 border-slate-200";
 };
 
-const getStatusOptions = (currentStatus) => {
+const getStatusOptions = (currentStatus: OrderStatus): OrderStatus[] => {
   if (orderStatuses.includes(currentStatus)) {
     return orderStatuses;
   }
@@ -46,16 +48,16 @@ const getStatusOptions = (currentStatus) => {
 };
 
 const AdminOrders = () => {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let isMounted = true;
 
     api
-      .get("/orders")
+      .get<Order[]>("/orders")
       .then(({ data }) => {
         if (isMounted) {
           setOrders(data);
@@ -63,7 +65,7 @@ const AdminOrders = () => {
       })
       .catch((err) => {
         if (isMounted) {
-          setError(err.response?.data?.message || "Unable to load orders");
+          setError(getApiErrorMessage(err, "Unable to load orders"));
         }
       })
       .finally(() => {
@@ -77,21 +79,18 @@ const AdminOrders = () => {
     };
   }, []);
 
-  const handleStatusChange = async (orderId, status) => {
+  const handleStatusChange = async (orderId: string, status: OrderStatus): Promise<void> => {
     setUpdatingId(orderId);
 
     try {
-      const { data } = await api.put(`/orders/${orderId}/status`, { status });
+      const { data } = await api.put<Order>(`/orders/${orderId}/status`, { status });
 
       setOrders((currentOrders) =>
         currentOrders.map((order) => (order._id === data._id ? data : order))
       );
       toast.success(`Order ${orderId.slice(-8).toUpperCase()} is now ${status}.`);
     } catch (err) {
-      const message =
-        err.response?.data?.errors?.[0]?.message ||
-        err.response?.data?.message ||
-        "Unable to update order status";
+      const message = getApiErrorMessage(err, "Unable to update order status");
 
       toast.error(message);
     } finally {
@@ -166,7 +165,7 @@ const AdminOrders = () => {
               <select
                 value={order.status}
                 onChange={(event) =>
-                  handleStatusChange(order._id, event.target.value)
+                  handleStatusChange(order._id, event.target.value as OrderStatus)
                 }
                 disabled={updatingId === order._id}
                 className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm capitalize outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"
@@ -230,7 +229,7 @@ const AdminOrders = () => {
                       <select
                         value={order.status}
                         onChange={(event) =>
-                          handleStatusChange(order._id, event.target.value)
+                          handleStatusChange(order._id, event.target.value as OrderStatus)
                         }
                         disabled={updatingId === order._id}
                         className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm capitalize outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"

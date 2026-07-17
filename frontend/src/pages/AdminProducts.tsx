@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
+import { getApiErrorMessage } from "../api/axios";
+import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
+import type { Product } from "../types";
 import EditProductModal from "../components/EditProductModal";
 import Loader from "../components/Loader";
 import ProductImage from "../components/ProductImage";
@@ -20,7 +23,9 @@ const emptyForm = {
 
 const maxImageSize = 5 * 1024 * 1024;
 
-const formatCurrency = (value) => {
+interface ProductForm { name: string; description: string; price: string; stock: string; category: string; image: string }
+
+const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -28,9 +33,9 @@ const formatCurrency = (value) => {
 };
 
 const AdminProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [formData, setFormData] = useState(emptyForm);
-  const [editingProduct, setEditingProduct] = useState(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [formData, setFormData] = useState<ProductForm>(emptyForm);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -41,7 +46,7 @@ const AdminProducts = () => {
     let isMounted = true;
 
     api
-      .get("/products")
+      .get<Product[]>("/products")
       .then(({ data }) => {
         if (isMounted) {
           setProducts(data);
@@ -49,7 +54,7 @@ const AdminProducts = () => {
       })
       .catch((err) => {
         if (isMounted) {
-          setError(err.response?.data?.message || "Unable to load products");
+          setError(getApiErrorMessage(err, "Unable to load products"));
         }
       })
       .finally(() => {
@@ -68,22 +73,22 @@ const AdminProducts = () => {
     setUploadInputKey((currentKey) => currentKey + 1);
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((current) => ({
       ...current,
       [event.target.name]: event.target.value,
     }));
   };
 
-  const handleEdit = (product) => {
+  const handleEdit = (product: Product): void => {
     setEditingProduct(product);
     setError("");
   };
 
   const uploadImageHandler = async (
-    event,
-    onImageUploaded,
-    setUploadingState
+    event: ChangeEvent<HTMLInputElement>,
+    onImageUploaded: (url: string) => void,
+    setUploadingState: Dispatch<SetStateAction<boolean>>
   ) => {
     const file = event.target.files?.[0];
 
@@ -119,14 +124,14 @@ const AdminProducts = () => {
 
       toast.success("Image uploaded successfully.");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Image upload failed.");
+      toast.error(getApiErrorMessage(err, "Image upload failed."));
       event.target.value = "";
     } finally {
       setUploadingState(false);
     }
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
 
     if (uploading) {
@@ -143,16 +148,13 @@ const AdminProducts = () => {
     };
 
     try {
-      const { data } = await api.post("/products", payload);
+      const { data } = await api.post<Product>("/products", payload);
       setProducts((current) => [data, ...current]);
       toast.success(`${getProductName(data)} created successfully.`);
 
       resetForm();
     } catch (err) {
-      const message =
-        err.response?.data?.errors?.[0]?.message ||
-        err.response?.data?.message ||
-        "Unable to save product";
+      const message = getApiErrorMessage(err, "Unable to save product");
 
       toast.error(message);
     } finally {
@@ -160,7 +162,7 @@ const AdminProducts = () => {
     }
   };
 
-  const handleProductUpdated = (updatedProduct) => {
+  const handleProductUpdated = (updatedProduct: Product): void => {
     setProducts((current) =>
       current.map((product) =>
         product._id === updatedProduct._id ? updatedProduct : product
@@ -169,7 +171,7 @@ const AdminProducts = () => {
     setEditingProduct(null);
   };
 
-  const handleDelete = async (productId) => {
+  const handleDelete = async (productId: string): Promise<void> => {
     const confirmed = window.confirm("Delete this product?");
 
     if (!confirmed) {
@@ -187,7 +189,7 @@ const AdminProducts = () => {
         setEditingProduct(null);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Unable to delete product");
+      toast.error(getApiErrorMessage(err, "Unable to delete product"));
     }
   };
 
@@ -316,7 +318,7 @@ const AdminProducts = () => {
                   value={formData.description}
                   onChange={handleChange}
                   required
-                  rows="4"
+                  rows={4}
                   className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>

@@ -12,11 +12,20 @@
 
 body {
   background: #f8fafc;
+  min-width: 320px;
+  min-height: 100vh;
 }
 
 .dark body {
-  background: #020617;
+  background:
+    radial-gradient(circle at 85% 5%, rgb(79 70 229 / 0.12), transparent 28rem),
+    radial-gradient(circle at 15% 95%, rgb(16 185 129 / 0.06), transparent 24rem),
+    #020617;
 }
+
+button, a, input, textarea, select { transition-duration: 200ms; }
+
+::selection { background: rgb(79 70 229 / 0.45); color: white; }
 
 .dark .bg-slate-50 {
   background-color: #020617;

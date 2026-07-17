@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
+import { getApiErrorMessage } from "../api/axios";
+import type { FormEvent } from "react";
+import type { ApiMessage } from "../types";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -8,23 +11,20 @@ const ForgotPassword = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setError("");
     setSuccess("");
     setLoading(true);
 
     try {
-      const { data } = await api.post("/auth/forgot-password", { email });
+      const { data } = await api.post<ApiMessage>("/auth/forgot-password", { email });
       setSuccess(
         data.message || "If this email exists, a reset link has been sent."
       );
       setEmail("");
     } catch (err) {
-      const message =
-        err.response?.data?.errors?.[0]?.message ||
-        err.response?.data?.message ||
-        "Unable to send reset link";
+      const message = getApiErrorMessage(err, "Unable to send reset link");
 
       setError(message);
     } finally {

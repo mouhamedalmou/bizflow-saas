@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import Loader from "../components/Loader";
+import type { Order, OrderStatus } from "../types";
+import { getApiErrorMessage } from "../api/axios";
 
-const formatCurrency = (value) => {
+const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   }).format(value || 0);
 };
 
-const formatDate = (value) => {
+const formatDate = (value: string): string => {
   if (!value) {
     return "No date";
   }
@@ -21,7 +23,7 @@ const formatDate = (value) => {
   }).format(new Date(value));
 };
 
-const statusStyles = {
+const statusStyles: Record<OrderStatus, string> = {
   pending: "bg-amber-50 text-amber-700 border-amber-200",
   processing: "bg-blue-50 text-blue-700 border-blue-200",
   shipped: "bg-indigo-50 text-indigo-700 border-indigo-200",
@@ -30,12 +32,12 @@ const statusStyles = {
   cancelled: "bg-red-50 text-red-700 border-red-200",
 };
 
-const getStatusClass = (status) => {
+const getStatusClass = (status: OrderStatus): string => {
   return statusStyles[status] || "bg-slate-50 text-slate-700 border-slate-200";
 };
 
 const MyOrders = () => {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -43,7 +45,7 @@ const MyOrders = () => {
     let isMounted = true;
 
     api
-      .get("/orders/my-orders")
+      .get<Order[]>("/orders/my-orders")
       .then(({ data }) => {
         if (isMounted) {
           setOrders(data);
@@ -51,7 +53,7 @@ const MyOrders = () => {
       })
       .catch((err) => {
         if (isMounted) {
-          setError(err.response?.data?.message || "Unable to load your orders");
+          setError(getApiErrorMessage(err, "Unable to load your orders"));
         }
       })
       .finally(() => {
