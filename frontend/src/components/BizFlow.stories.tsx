@@ -1,0 +1,22 @@
+import { useState } from "react";
+import { BarChart3, Mail, Package, Search } from "lucide-react";
+import { Badge, Button, Card, ConfirmDialog, EmptyState, ErrorState, FilterDropdown, Input, LoadingSpinner, Modal, OrderCard, Pagination, ProductCard, ProgressBar, SearchInput, Select, Skeleton, StatsCard, StatusBadge, Table, Toast, ToastProvider, useToasts, type TableColumn } from "./index";
+
+export default { title: "BizFlow/Component Library", parameters: { layout: "centered", backgrounds: { default: "dark" } } };
+const Frame = ({ children }: { children: React.ReactNode }) => <div className="w-[min(90vw,720px)] bg-slate-950 p-6 text-slate-100">{children}</div>;
+
+export const Buttons = () => <Frame><div className="flex flex-wrap gap-3"><Button>Primary</Button><Button variant="secondary">Secondary</Button><Button variant="danger">Danger</Button><Button variant="ghost">Ghost</Button><Button loading>Saving</Button></div></Frame>;
+export const CardsAndBadges = () => <Frame><Card title="Inventory" subtitle="Live stock overview" footer={<Button size="sm">Open</Button>} interactive><div className="flex gap-2"><Badge label="Active" color="emerald" /><StatusBadge status="processing" /></div></Card></Frame>;
+export const FormControls = () => <Frame><div className="grid gap-4 sm:grid-cols-2"><Input label="Email" type="email" icon={<Mail size={17} />} placeholder="name@company.com" required /><Input label="Search" icon={<Search size={17} />} error="Campo obbligatorio" /><Select label="Category" options={[{ value: "office", label: "Office" }, { value: "tech", label: "Technology" }]} /></div></Frame>;
+export const Dialogs = () => { const [open, setOpen] = useState(true); return <Frame><Button onClick={() => setOpen(true)}>Open</Button><Modal isOpen={open} onClose={() => setOpen(false)} title="Edit product"><p>Modal content</p></Modal></Frame>; };
+export const Confirmation = () => { const [open, setOpen] = useState(true); return <Frame><ConfirmDialog isOpen={open} title="Delete product?" message="This action cannot be undone." isDangerous onConfirm={() => setOpen(false)} onCancel={() => setOpen(false)} /></Frame>; };
+export const Statistics = () => <Frame><div className="grid gap-4 sm:grid-cols-2"><StatsCard label="Revenue" value="€24,800" icon={<BarChart3 />} trend={12.4} /><StatsCard label="Low stock" value="8" icon={<Package />} trend={-4} color="amber" /></div></Frame>;
+export const ProductsAndOrders = () => <Frame><div className="grid gap-4 sm:grid-cols-2"><ProductCard product={{ id: "p1", name: "Wireless Keyboard", price: 89, stock: 7, imageUrl: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80" }} /><OrderCard order={{ id: "A1042", date: new Date(), status: "shipped", totalPrice: 142, itemCount: 3 }} /></div></Frame>;
+interface StoryRow { id: string; name: string; stock: number }
+const columns: TableColumn<StoryRow>[] = [{ key: "name", header: "Product", render: (row) => row.name, sortValue: (row) => row.name }, { key: "stock", header: "Stock", render: (row) => row.stock, sortValue: (row) => row.stock }];
+export const DataTable = () => <Frame><Table columns={columns} data={[{ id: "1", name: "Keyboard", stock: 7 }, { id: "2", name: "Monitor", stock: 15 }]} rowKey={(row) => row.id} caption="Products" /></Frame>;
+export const LoadingAndStates = () => <Frame><div className="space-y-5"><LoadingSpinner /><Skeleton className="h-16" /><ProgressBar value={64} label="Upload" /><EmptyState message="No products match the filters." /><ErrorState message="Unable to load data." onRetry={() => undefined} /></div></Frame>;
+export const SearchAndFilters = () => { const [filters, setFilters] = useState<string[]>([]); return <Frame><div className="flex gap-3"><div className="flex-1"><SearchInput onChange={() => undefined} /></div><FilterDropdown options={[{ value: "active", label: "Active" }, { value: "low", label: "Low stock" }]} value={filters} onChange={setFilters} /></div></Frame>; };
+export const Paging = () => { const [page, setPage] = useState(3); return <Frame><Pagination currentPage={page} totalPages={9} onPageChange={setPage} /></Frame>; };
+const ToastDemo = () => { const { showToast } = useToasts(); return <Button onClick={() => showToast({ message: "Product saved successfully", type: "success" })}>Show toast</Button>; };
+export const Notifications = () => <ToastProvider><Frame><div className="space-y-3"><Toast message="Inventory updated" type="info" duration={0} /><ToastDemo /></div></Frame></ToastProvider>;

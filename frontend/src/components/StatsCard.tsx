@@ -1,0 +1,6 @@
+import type { ReactNode } from "react";
+import { TrendingDown, TrendingUp } from "lucide-react";
+import { Card } from "./Card";
+export interface StatsCardProps { label: string; value: ReactNode; icon: ReactNode; trend?: number; color?: "indigo" | "emerald" | "amber" | "red" }
+const colors = { indigo: "from-indigo-500 to-indigo-700 shadow-indigo-950/30", emerald: "from-emerald-400 to-emerald-600 shadow-emerald-950/30", amber: "from-amber-400 to-amber-600 shadow-amber-950/30", red: "from-red-400 to-red-600 shadow-red-950/30" } as const;
+export function StatsCard({ label, value, icon, trend, color = "indigo" }: StatsCardProps) { const positive = (trend ?? 0) >= 0; return <Card interactive elevation="sm" hover={false}><div className="flex items-start justify-between gap-4"><div><p className="text-sm text-slate-400">{label}</p><p className="mt-2 text-2xl font-bold text-slate-100">{value}</p>{trend !== undefined && <p className={`mt-2 inline-flex items-center gap-1 text-xs font-semibold ${positive ? "text-emerald-400" : "text-red-400"}`}>{positive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}{Math.abs(trend)}%</p>}</div><span className={`rounded-lg bg-gradient-to-br p-3 text-white shadow-lg ${colors[color]}`}>{icon}</span></div></Card>; }
