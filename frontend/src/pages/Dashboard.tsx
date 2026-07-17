@@ -98,7 +98,7 @@ const Dashboard = () => {
     <section className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-950">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-slate-100 lg:text-4xl">Dashboard</h1>
           <p className="text-sm text-slate-500">
             Welcome back, {user?.name}. Your role is {user?.role}.
           </p>
@@ -113,7 +113,7 @@ const Dashboard = () => {
 
       {user?.role === "admin" ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
               <p className="text-sm text-slate-500">Users</p>
               <p className="mt-2 text-2xl font-bold text-slate-950">

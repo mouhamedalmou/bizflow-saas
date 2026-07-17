@@ -9,9 +9,7 @@ const getInitialTheme = (): "light" | "dark" => {
     return storedTheme;
   }
 
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-
-  return prefersDark ? "dark" : "light";
+  return "dark";
 };
 
 export const ThemeProvider = ({ children }: ChildrenProps) => {

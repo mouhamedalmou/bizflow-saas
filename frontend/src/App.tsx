@@ -24,7 +24,7 @@ function App() {
   const { isDark } = useTheme();
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-950 text-slate-100 transition-colors duration-200">
       <Toaster
         position="top-right"
         toastOptions={{

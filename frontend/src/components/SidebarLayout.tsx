@@ -1,222 +1,44 @@
-import { useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { NavLink, Outlet, useLocation, useNavigate, type NavLinkRenderProps } from "react-router-dom";
+import { Bell, Boxes, ChevronDown, ClipboardList, LayoutDashboard, LogOut, Menu, Moon, Package, Search, Settings, ShieldCheck, Sun, X } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import type { NavLinkRenderProps } from "react-router-dom";
 import type { User } from "../types";
-import { Bell, Boxes, ClipboardList, LayoutDashboard, LogOut, Menu, Moon, Package, Search, Settings, ShieldCheck, Sun } from "lucide-react";
 
-const mainLinks = [
-  { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { label: "Products", path: "/products", icon: Package },
-  { label: "My Orders", path: "/my-orders", icon: ClipboardList },
-];
+const mainLinks = [{ label: "Dashboard", path: "/dashboard", icon: LayoutDashboard }, { label: "Products", path: "/products", icon: Package }, { label: "Orders", path: "/my-orders", icon: ClipboardList }];
+const adminLinks = [{ label: "Admin Products", path: "/admin/products", icon: Boxes }, { label: "Admin Orders", path: "/admin/orders", icon: ShieldCheck }];
+const pageTitles: Record<string, string> = { "/dashboard": "Dashboard", "/products": "Products", "/my-orders": "Orders", "/admin/products": "Admin Products", "/admin/orders": "Admin Orders" };
+const initials = (name = ""): string => name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "U";
+const navClass = ({ isActive }: NavLinkRenderProps): string => `flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold outline-none transition-all duration-200 ease-in-out focus-visible:ring-2 focus-visible:ring-indigo-400 ${isActive ? "bg-indigo-600 text-white shadow-sm shadow-indigo-950/30" : "text-slate-300 hover:bg-slate-800 hover:text-slate-100 active:bg-slate-700"}`;
 
-const adminLinks = [
-  { label: "Admin Products", path: "/admin/products", icon: Boxes },
-  { label: "Admin Orders", path: "/admin/orders", icon: ShieldCheck },
-];
+interface SidebarContentProps { user: User | null; onNavigate?: () => void; onLogout: () => void }
+function SidebarContent({ user, onNavigate, onLogout }: SidebarContentProps) {
+  return <div className="flex h-full min-h-0 flex-col bg-gradient-to-b from-slate-900 to-slate-950">
+    <div className="flex h-18 shrink-0 items-center gap-3 border-b border-slate-800 px-5"><span className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 text-sm font-bold text-white shadow-lg shadow-indigo-950/30">BF</span><div><p className="font-bold text-slate-100">BizFlow SaaS</p><p className="text-xs text-slate-400">Business workspace</p></div></div>
+    <nav aria-label="Main navigation" className="bizflow-scrollbar min-h-0 flex-1 overflow-y-auto px-3 py-5"><p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Workspace</p><div className="mt-2 space-y-1">{mainLinks.map(({ label, path, icon: Icon }) => <NavLink key={path} to={path} onClick={onNavigate} className={navClass}><Icon aria-hidden="true" className="h-5 w-5" />{label}</NavLink>)}</div>
+      {user?.role === "admin" && <div className="mt-6"><p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Admin Panel</p><div className="mt-2 space-y-1">{adminLinks.map(({ label, path, icon: Icon }) => <NavLink key={path} to={path} onClick={onNavigate} className={navClass}><Icon aria-hidden="true" className="h-5 w-5" />{label}</NavLink>)}</div></div>}
+      <div className="mt-6"><p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Account</p><button type="button" className="mt-2 flex min-h-10 w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-300 outline-none transition-all duration-200 hover:bg-slate-800 hover:text-white focus-visible:ring-2 focus-visible:ring-indigo-400"><Settings className="h-5 w-5" />Settings</button></div>
+    </nav>
+    <div className="shrink-0 border-t border-slate-800 p-4"><div className="flex items-center gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-indigo-600 text-xs font-bold text-white">{user?.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : initials(user?.name)}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-slate-100">{user?.name}</p><p className="truncate text-xs capitalize text-slate-400">{user?.role}</p></div><button type="button" aria-label="Logout" onClick={onLogout} className="grid min-h-10 min-w-10 place-items-center rounded-lg text-slate-400 outline-none transition-all duration-200 hover:bg-red-500/10 hover:text-red-400 focus-visible:ring-2 focus-visible:ring-red-400"><LogOut className="h-5 w-5" /></button></div></div>
+  </div>;
+}
 
-const pageTitles: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/products": "Products",
-  "/my-orders": "My Orders",
-  "/admin/products": "Admin Products",
-  "/admin/orders": "Admin Orders",
-};
-
-const getInitials = (name = ""): string => {
-  const initials = name
-    .trim()
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("");
-
-  return initials || "U";
-};
-
-const navLinkClass = ({ isActive }: NavLinkRenderProps): string =>
-  [
-    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
-    isActive
-      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-950/30"
-      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white",
-  ].join(" ");
-
-interface SidebarContentProps { user: User | null; onNavigate?: () => void }
-
-const SidebarContent = ({ user, onNavigate }: SidebarContentProps) => {
-  return (
-    <div className="flex h-full flex-col">
-      <div className="border-b border-slate-200 px-5 py-5 dark:border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-sm font-bold text-white shadow-lg shadow-indigo-950/30">
-            BF
-          </div>
-          <div>
-            <p className="font-bold text-slate-950 dark:text-white">
-              BizFlow SaaS
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Business workspace
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-3 py-4">
-        <p className="px-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Workspace
-        </p>
-        <div className="mt-2 space-y-1">
-          {mainLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              onClick={onNavigate}
-              className={navLinkClass}
-            >
-              <Icon size={18} /><span>{link.label}</span>
-            </NavLink>
-          )})}
-        </div>
-
-        {user?.role === "admin" && (
-          <div className="mt-6">
-            <p className="px-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Admin
-            </p>
-            <div className="mt-2 space-y-1">
-              {adminLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                <NavLink
-                  key={link.path}
-                  to={link.path}
-                  onClick={onNavigate}
-                  className={navLinkClass}
-                >
-                  <Icon size={18} /><span>{link.label}</span>
-                </NavLink>
-              )})}
-              <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white"><Settings size={18} />Settings</button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="border-t border-slate-200 p-4 dark:border-slate-800">
-        <div className="flex items-center gap-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-900">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white dark:bg-blue-600">
-            {getInitials(user?.name)}
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-slate-950 dark:text-white">
-              {user?.name}
-            </p>
-            <p className="truncate text-xs capitalize text-slate-500 dark:text-slate-400">
-              {user?.role}
-            </p>
-          </div>
-        </div>
-      </div>
+export default function SidebarLayout() {
+  const { user, logout } = useAuth(); const { isDark, toggleTheme } = useTheme(); const [sidebarOpen, setSidebarOpen] = useState(false); const [profileOpen, setProfileOpen] = useState(false); const profileRef = useRef<HTMLDivElement>(null); const navigate = useNavigate(); const location = useLocation(); const pageTitle = pageTitles[location.pathname] ?? "BizFlow";
+  const handleLogout = (): void => { logout(); navigate("/login", { replace: true }); };
+  useEffect(() => { setSidebarOpen(false); setProfileOpen(false); }, [location.pathname]);
+  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") { setSidebarOpen(false); setProfileOpen(false); } }; document.addEventListener("keydown", close); document.body.style.overflow = sidebarOpen ? "hidden" : ""; return () => { document.removeEventListener("keydown", close); document.body.style.overflow = ""; }; }, [sidebarOpen]);
+  useEffect(() => { const outside = (event: MouseEvent) => { if (!profileRef.current?.contains(event.target as Node)) setProfileOpen(false); }; document.addEventListener("mousedown", outside); return () => document.removeEventListener("mousedown", outside); }, []);
+  return <div className="flex h-dvh overflow-hidden bg-slate-950 text-slate-100">
+    <aside className="hidden h-full w-64 shrink-0 border-r border-slate-800 lg:block"><SidebarContent user={user} onLogout={handleLogout} /></aside>
+    <div aria-hidden={!sidebarOpen} className={`fixed inset-0 z-40 lg:hidden ${sidebarOpen ? "pointer-events-auto" : "pointer-events-none"}`}><button aria-label="Close navigation" tabIndex={sidebarOpen ? 0 : -1} onClick={() => setSidebarOpen(false)} className={`absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity duration-300 ${sidebarOpen ? "opacity-100" : "opacity-0"}`} /><aside aria-label="Mobile navigation" className={`relative h-full w-full border-r border-slate-800 shadow-2xl transition-transform duration-300 ease-in-out sm:w-80 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}><button aria-label="Close menu" onClick={() => setSidebarOpen(false)} className="absolute right-4 top-4 z-10 grid min-h-10 min-w-10 place-items-center rounded-lg text-slate-300 hover:bg-slate-800 sm:hidden"><X /></button><SidebarContent user={user} onNavigate={() => setSidebarOpen(false)} onLogout={handleLogout} /></aside></div>
+    <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <header className="sticky top-0 z-30 h-16 shrink-0 border-b border-slate-800 bg-gradient-to-r from-slate-900 to-slate-900/90 backdrop-blur-xl"><div className="flex h-full items-center gap-3 px-4 sm:px-6 lg:px-8"><button type="button" aria-label="Open navigation" aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(true)} className="grid min-h-10 min-w-10 place-items-center rounded-lg border border-slate-700 text-slate-200 outline-none transition-all duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-indigo-400 lg:hidden"><Menu className="h-5 w-5" /></button><div className="hidden min-w-36 md:block"><p className="text-xs font-medium uppercase tracking-wider text-slate-500">BizFlow</p><h1 className="truncate text-base font-bold text-slate-100 lg:text-lg">{pageTitle}</h1></div>
+        <label className="relative mx-auto hidden w-full max-w-md md:block"><span className="sr-only">Search BizFlow</span><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input type="search" placeholder="Search products, orders..." className="w-full rounded-lg border border-slate-700 bg-slate-950/70 py-2 pl-10 pr-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" /></label>
+        <div className="ml-auto flex items-center gap-2"><button aria-label="Notifications" className="relative grid min-h-10 min-w-10 place-items-center rounded-lg text-slate-400 outline-none transition-all duration-200 hover:bg-slate-800 hover:text-white focus-visible:ring-2 focus-visible:ring-indigo-400"><Bell className="h-5 w-5" /><span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-amber-500 ring-2 ring-slate-900" /></button><button aria-label="Toggle dark theme" onClick={toggleTheme} className="hidden min-h-10 min-w-10 place-items-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white sm:grid">{isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</button>
+          <div ref={profileRef} className="relative"><button aria-label="Open user menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)} className="flex min-h-10 items-center gap-2 rounded-lg px-1.5 outline-none transition-all duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-indigo-400"><span className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-indigo-600 text-xs font-bold">{user?.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : initials(user?.name)}</span><span className="hidden max-w-28 truncate text-sm font-semibold text-slate-200 xl:block">{user?.name}</span><ChevronDown className={`hidden h-4 w-4 text-slate-500 transition-transform sm:block ${profileOpen ? "rotate-180" : ""}`} /></button>{profileOpen && <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-slate-700 bg-slate-900 p-2 shadow-xl shadow-black/30"><div className="border-b border-slate-700 px-3 py-2"><p className="truncate text-sm font-semibold">{user?.name}</p><p className="truncate text-xs text-slate-400">{user?.email}</p></div><button onClick={handleLogout} className="mt-1 flex min-h-10 w-full items-center gap-2 rounded-lg px-3 text-sm text-red-400 hover:bg-red-500/10"><LogOut className="h-4 w-4" />Logout</button></div>}</div>
+        </div></div></header>
+      <main className="bizflow-scrollbar min-h-0 flex-1 overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"><div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8"><Outlet /></div><footer className="border-t border-slate-800 px-4 py-4 text-center text-xs text-slate-500">© {new Date().getFullYear()} BizFlow SaaS. All rights reserved.</footer></main>
     </div>
-  );
-};
-
-const SidebarLayout = () => {
-  const { user, logout } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const pageTitle = pageTitles[location.pathname] || "BizFlow";
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login", { replace: true });
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-transparent dark:text-slate-100">
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <button
-            type="button"
-            aria-label="Close sidebar"
-            className="absolute inset-0 bg-slate-950/50"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <aside className="relative h-full w-72 border-r border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
-            <SidebarContent
-              user={user}
-              onNavigate={() => setSidebarOpen(false)}
-            />
-          </aside>
-        </div>
-      )}
-
-      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 lg:block">
-        <SidebarContent user={user} />
-      </aside>
-
-      <div className="lg:pl-72">
-        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-xl dark:border-slate-700 dark:bg-slate-950/80">
-          <div className="flex min-h-16 items-center justify-between gap-4 px-4 sm:px-6">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Open navigation"
-                className="rounded-lg border border-slate-300 p-2 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 lg:hidden"
-              >
-                <Menu size={20} />
-              </button>
-
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                  BizFlow
-                </p>
-                <h1 className="text-lg font-bold text-slate-950 dark:text-white">
-                  {pageTitle}
-                </h1>
-              </div>
-            </div>
-
-            <div className="hidden max-w-md flex-1 md:block"><label className="relative block"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={17} /><input aria-label="Search" placeholder="Search products, orders..." className="w-full rounded-xl border border-slate-700 bg-slate-900/70 py-2 pl-10 pr-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" /></label></div>
-            <div className="flex items-center gap-2">
-              <button aria-label="Notifications" className="relative rounded-lg border border-slate-700 p-2 text-slate-400 hover:border-indigo-500 hover:text-white"><Bell size={19} /><span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-amber-500" /></button>
-              <button
-                type="button"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-                className="rounded-lg border border-slate-300 p-2 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:bg-slate-800"
-              >
-                {isDark ? <Sun size={19} /> : <Moon size={19} />}
-              </button>
-              <button
-                type="button"
-                onClick={handleLogout}
-                aria-label="Logout"
-                className="rounded-lg bg-slate-900 p-2 text-white hover:bg-slate-700 dark:bg-indigo-600 dark:hover:bg-indigo-500"
-              >
-                <LogOut size={19} />
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-          <Outlet />
-        </main>
-        <footer className="border-t border-slate-800 px-6 py-4 text-center text-xs text-slate-500">© {new Date().getFullYear()} BizFlow SaaS. All rights reserved.</footer>
-      </div>
-    </div>
-  );
-};
-
-export default SidebarLayout;
+  </div>;
+}

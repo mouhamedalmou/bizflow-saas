@@ -106,7 +106,7 @@ const AdminOrders = () => {
     <section className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-950">Admin Orders</h1>
+          <h1 className="text-3xl font-bold text-slate-100 lg:text-4xl">Admin Orders</h1>
           <p className="text-sm text-slate-500">
             Review all customer orders and manage fulfillment status.
           </p>
