@@ -68,7 +68,7 @@ export function Table<T>({
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto rounded-xl border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
-        <table className="min-w-full text-sm">
+        <table className="w-full min-w-[900px] text-sm">
           <caption className="sr-only">{caption}</caption>
           <thead className="border-b border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800/80">
             <tr>

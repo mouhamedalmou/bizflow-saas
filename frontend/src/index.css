@@ -1,3 +1,11 @@
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/inter/latin-700.css";
+@import "@fontsource/geist/latin-700.css";
+@import "@fontsource/geist/latin-800.css";
+@import "@fontsource/jetbrains-mono/latin-400.css";
+
 @config "../tailwind.config.js";
 @import "tailwindcss";
 
@@ -19,6 +27,17 @@ body {
   color: #0f172a;
   min-width: 320px;
   min-height: 100vh;
+  font-family: "Inter", system-ui, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+  letter-spacing: -0.025em;
 }
 
 .dark body {
@@ -53,7 +72,7 @@ button, a, input, textarea, select { transition-duration: 200ms; }
 .dark .text-muted { color: #94a3b8; }
 
 /* Desktop shell refinements. */
-.max-w-7xl { max-width: 96rem; }
+.max-w-7xl { max-width: none; }
 :root:not(.dark) [class~="sticky"][class~="z-30"][class~="border-b"] {
   box-shadow: 0 1px 3px rgb(15 23 42 / 0.07);
 }

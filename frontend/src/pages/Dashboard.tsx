@@ -120,11 +120,11 @@ const Dashboard = () => {
   ] as const;
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8 lg:space-y-10">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-100 lg:text-4xl">Dashboard</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-slate-100 lg:text-5xl">Dashboard</h1>
+          <p className="mt-2 text-base leading-relaxed text-slate-500">
             Welcome back, {user?.name}. Your role is {user?.role}.
           </p>
         </div>
@@ -138,12 +138,12 @@ const Dashboard = () => {
 
       {user?.role === "admin" ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-6 lg:grid-cols-3 xl:grid-cols-6">
             {adminStats.map((item) => <StatsCard key={item.label} {...item} />)}
           </div>
 
-          <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
+            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:col-span-8 lg:p-8">
               <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <h2 className="font-semibold text-slate-950">
@@ -214,7 +214,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:col-span-4 lg:p-8">
               <h2 className="font-semibold text-slate-950">
                 Orders analytics
               </h2>
@@ -275,7 +275,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
             <div className="mb-4">
               <h2 className="font-semibold text-slate-950">Monthly sales</h2>
               <p className="text-sm text-slate-500">

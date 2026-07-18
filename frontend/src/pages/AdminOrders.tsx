@@ -103,11 +103,11 @@ const AdminOrders = () => {
   }
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8 lg:space-y-10">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-100 lg:text-4xl">Admin Orders</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-slate-100 lg:text-5xl">Admin Orders</h1>
+          <p className="mt-2 text-base leading-relaxed text-slate-500">
             Review all customer orders and manage fulfillment status.
           </p>
         </div>
@@ -184,7 +184,15 @@ const AdminOrders = () => {
       {orders.length > 0 && (
         <div className="hidden overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:block">
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="w-full min-w-[1100px] table-fixed text-sm">
+              <colgroup>
+                <col className="w-[13%]" />
+                <col className="w-[27%]" />
+                <col className="w-[16%]" />
+                <col className="w-[12%]" />
+                <col className="w-[14%]" />
+                <col className="w-[18%]" />
+              </colgroup>
               <thead className="border-b border-slate-300 bg-slate-100 text-left text-slate-900 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200">
                 <tr>
                   <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Order</th>
@@ -198,21 +206,21 @@ const AdminOrders = () => {
               <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                 {orders.map((order, index) => (
                   <tr key={order._id} className={`table-row transition-colors duration-150 hover:bg-indigo-50/70 dark:hover:bg-slate-700/70 ${index % 2 === 0 ? "bg-white dark:bg-slate-900/70" : "bg-slate-50 dark:bg-slate-800/35"}`}>
-                    <td className="px-5 py-3.5 font-semibold text-slate-950">
+                    <td className="px-5 py-4 font-mono text-sm font-semibold tabular-nums text-slate-950">
                       #{order._id.slice(-8).toUpperCase()}
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-5 py-4">
                       <p className="font-medium text-slate-950">
                         {order.user?.name || "Unknown customer"}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="truncate text-xs text-slate-500">
                         {order.user?.email || "No email"}
                       </p>
                     </td>
-                    <td className="px-5 py-3.5 text-slate-700 dark:text-slate-300">
+                    <td className="px-5 py-4 text-slate-700 dark:text-slate-300">
                       {formatDate(order.createdAt)}
                     </td>
-                    <td className="px-5 py-3.5 font-semibold text-slate-950">
+                    <td className="px-5 py-4 font-mono font-semibold tabular-nums text-slate-950">
                       {formatCurrency(order.totalPrice)}
                     </td>
                     <td className="px-5 py-3.5">
