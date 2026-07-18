@@ -20,7 +20,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 import Loader from "../components/Loader";
 import { StatsCard } from "../components/StatsCard";
-import type { DashboardStats, Order, OrderStatus } from "../types";
+import type { ApiEnvelope, DashboardStats, Order, OrderStatus } from "../types";
 import { getApiErrorMessage } from "../api/axios";
 
 const formatCurrency = (value: number): string => {
@@ -29,6 +29,9 @@ const formatCurrency = (value: number): string => {
     currency: "USD",
   }).format(value || 0);
 };
+
+const unwrapDashboardStats = (payload: DashboardStats | ApiEnvelope<DashboardStats>): DashboardStats =>
+  "data" in payload ? payload.data : payload;
 
 const ChartEmptyState = ({ icon, title, message }: { icon: ReactNode; title: string; message: string }) => (
   <div className="grid h-full place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50/70 px-6 text-center dark:border-slate-700 dark:bg-slate-950/30">
@@ -61,11 +64,11 @@ const Dashboard = () => {
       try {
         if (user?.role === "admin") {
           const [statsResponse, recentOrdersResponse] = await Promise.all([
-            api.get<DashboardStats>("/dashboard/stats"),
+            api.get<DashboardStats | ApiEnvelope<DashboardStats>>("/dashboard/stats"),
             api.get<Order[]>("/dashboard/recent-orders"),
           ]);
 
-          setStats(statsResponse.data);
+          setStats(unwrapDashboardStats(statsResponse.data));
           setRecentOrders(recentOrdersResponse.data);
         } else {
           const { data } = await api.get<Order[]>("/orders/my-orders");
