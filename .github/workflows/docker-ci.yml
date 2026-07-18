@@ -113,9 +113,13 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: curl --fail --show-error --retry 5 --retry-delay 5 http://127.0.0.1/health
 
-      - name: Show container logs on failure
+      - name: Show container diagnostics on failure
         if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: docker compose -f docker-compose.prod.yml logs --no-color
+        run: |
+          docker compose -f docker-compose.prod.yml ps --all
+          docker compose -f docker-compose.prod.yml logs --no-color backend
+          docker inspect bizflow-backend
+          docker inspect --format='{{json .State.Health}}' bizflow-backend
 
       - name: Stop production stack
         if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
