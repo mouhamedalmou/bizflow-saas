@@ -7,10 +7,11 @@ import { categoryName, type Product } from "../types";
 import EditProductModal from "../components/EditProductModal";
 import Loader from "../components/Loader";
 import ProductImage from "../components/ProductImage";
-import {
-  getProductDescription,
-  getProductName,
-} from "../utils/productDisplay";
+import { getProductName } from "../utils/productDisplay";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { InlineAlert, PageHeader } from "../components/PageLayout";
+import { SearchInput } from "../components/SearchInput";
+import { StockBadge } from "../components/StockBadge";
 
 const emptyForm = {
   name: "",
@@ -41,6 +42,9 @@ const AdminProducts = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadInputKey, setUploadInputKey] = useState(0);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
+  const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -172,12 +176,7 @@ const AdminProducts = () => {
   };
 
   const handleDelete = async (productId: string): Promise<void> => {
-    const confirmed = window.confirm("Delete this product?");
-
-    if (!confirmed) {
-      return;
-    }
-
+    setDeleting(true);
     try {
       await api.delete(`/products/${productId}`);
       setProducts((current) =>
@@ -188,8 +187,11 @@ const AdminProducts = () => {
       if (editingProduct?._id === productId) {
         setEditingProduct(null);
       }
+      setDeleteProduct(null);
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Unable to delete product"));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -198,24 +200,14 @@ const AdminProducts = () => {
   }
 
   const productsList = Array.isArray(products) ? products : [];
+  const visibleProducts = productsList.filter((product) => `${getProductName(product)} ${product.category ? categoryName(product.category) : ""}`.toLowerCase().includes(query.toLowerCase()));
 
   return (
     <section className="space-y-8 font-sans lg:space-y-10">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-display text-4xl font-extrabold tracking-tight text-slate-950 dark:text-slate-100 lg:text-5xl">
-            Admin Products
-          </h1>
-          <p className="mt-2 text-base leading-relaxed text-slate-600 dark:text-slate-400">
-            Create, update and remove products from the catalog.
-          </p>
-        </div>
-      </div>
+      <PageHeader title="Admin Products" subtitle="Create, update and remove products from the catalog." actions={<SearchInput onChange={setQuery} placeholder="Search products..." />} />
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
-          {error}
-        </div>
+        <InlineAlert>{error}</InlineAlert>
       )}
 
       <div className="space-y-6">
@@ -390,13 +382,13 @@ const AdminProducts = () => {
           </button>
         </form>
 
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-black/20">
+        <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-black/20">
           <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-700">
             <h2 className="font-display text-xl font-bold text-slate-950 dark:text-slate-100">Product catalog</h2>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-[900px] table-fixed divide-y divide-slate-200 font-sans text-sm dark:divide-slate-700">
+            <table className="w-full min-w-[900px] table-fixed divide-y divide-slate-200 font-sans text-sm dark:divide-slate-700">
               <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500 dark:bg-slate-950/60 dark:text-slate-400">
                 <tr>
                   <th className="w-24 px-4 py-3 font-medium">Image</th>
@@ -404,11 +396,12 @@ const AdminProducts = () => {
                   <th className="w-40 px-4 py-3 font-medium">Category</th>
                   <th className="w-24 px-4 py-3 font-medium">Price</th>
                   <th className="w-20 px-4 py-3 font-medium">Stock</th>
+                  <th className="w-32 px-4 py-3 font-medium">Status</th>
                   <th className="w-36 px-4 py-3 text-right font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {productsList.map((product) => (
+                {visibleProducts.map((product) => (
                   <tr key={product._id} className="transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60">
                     <td className="px-4 py-3">
                       <ProductImage
@@ -420,9 +413,6 @@ const AdminProducts = () => {
                     <td className="px-4 py-3">
                       <p className="font-semibold text-slate-950 dark:text-slate-100">
                         {getProductName(product)}
-                      </p>
-                      <p className="max-w-sm truncate text-xs text-slate-500 dark:text-slate-400">
-                        {getProductDescription(product.description)}
                       </p>
                     </td>
                     <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
@@ -436,6 +426,7 @@ const AdminProducts = () => {
                     <td className="px-4 py-3 font-mono font-medium tabular-nums text-slate-700 dark:text-slate-300">
                       {product.stock}
                     </td>
+                    <td className="px-4 py-3"><StockBadge stock={product.stock} /></td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">
                         <button
@@ -447,7 +438,7 @@ const AdminProducts = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDelete(product._id)}
+                          onClick={() => setDeleteProduct(product)}
                           className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors duration-200 hover:bg-red-50 dark:border-red-500/30 dark:text-red-300 dark:hover:bg-red-500/10"
                         >
                           Delete
@@ -457,9 +448,9 @@ const AdminProducts = () => {
                   </tr>
                 ))}
 
-                {productsList.length === 0 && (
+                {visibleProducts.length === 0 && (
                   <tr>
-                    <td className="px-4 py-8 text-center text-slate-500 dark:text-slate-400" colSpan={6}>
+                    <td className="px-4 py-8 text-center text-slate-500 dark:text-slate-400" colSpan={7}>
                       No products found.
                     </td>
                   </tr>
@@ -477,6 +468,7 @@ const AdminProducts = () => {
           onUpdated={handleProductUpdated}
         />
       )}
+      <ConfirmDialog isOpen={Boolean(deleteProduct)} title="Delete product" message={`Delete ${deleteProduct ? getProductName(deleteProduct) : "this product"}? This action cannot be undone.`} confirmLabel="Delete" cancelLabel="Cancel" isDangerous loading={deleting} onCancel={() => setDeleteProduct(null)} onConfirm={() => deleteProduct ? handleDelete(deleteProduct._id) : undefined} />
     </section>
   );
 };

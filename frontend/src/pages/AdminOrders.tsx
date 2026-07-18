@@ -4,6 +4,11 @@ import api from "../api/axios";
 import Loader from "../components/Loader";
 import type { Order, OrderStatus } from "../types";
 import { getApiErrorMessage } from "../api/axios";
+import { EmptyState } from "../components/EmptyState";
+import { PageHeader, InlineAlert } from "../components/PageLayout";
+import { Pagination } from "../components/Pagination";
+import { SearchInput } from "../components/SearchInput";
+import { StatusBadge, type DisplayOrderStatus } from "../components/StatusBadge";
 
 const orderStatuses: OrderStatus[] = ["pending", "processing", "shipped", "delivered"];
 
@@ -26,19 +31,6 @@ const formatDate = (value: string): string => {
   }).format(new Date(value));
 };
 
-const statusStyles: Record<OrderStatus, string> = {
-  pending: "border-amber-300 bg-amber-100 text-amber-950 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-200",
-  processing: "border-cyan-300 bg-cyan-100 text-cyan-950 dark:border-cyan-500/30 dark:bg-cyan-500/15 dark:text-cyan-200",
-  shipped: "border-blue-300 bg-blue-100 text-blue-950 dark:border-blue-500/30 dark:bg-blue-500/15 dark:text-blue-200",
-  delivered: "border-emerald-300 bg-emerald-100 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-200",
-  completed: "border-emerald-300 bg-emerald-100 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-200",
-  cancelled: "border-red-300 bg-red-100 text-red-950 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-200",
-};
-
-const getStatusClass = (status: OrderStatus): string => {
-  return statusStyles[status] || "border-slate-300 bg-slate-100 text-slate-900 dark:border-slate-500/30 dark:bg-slate-500/15 dark:text-slate-200";
-};
-
 const getStatusOptions = (currentStatus: OrderStatus): OrderStatus[] => {
   if (orderStatuses.includes(currentStatus)) {
     return orderStatuses;
@@ -52,6 +44,8 @@ const AdminOrders = () => {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     let isMounted = true;
@@ -102,36 +96,25 @@ const AdminOrders = () => {
     return <Loader label="Loading admin orders..." />;
   }
 
+  const filteredOrders = orders.filter((order) => `${order._id} ${order.user?.name ?? ""} ${order.user?.email ?? ""}`.toLowerCase().includes(query.toLowerCase()));
+  const totalPages = Math.ceil(filteredOrders.length / 10);
+  const visibleOrders = filteredOrders.slice((page - 1) * 10, page * 10);
+  const displayStatus = (status: OrderStatus): DisplayOrderStatus => status === "completed" ? "delivered" : status;
+
   return (
     <section className="space-y-8 lg:space-y-10">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-display text-4xl font-extrabold tracking-tight text-slate-100 lg:text-5xl">Admin Orders</h1>
-          <p className="mt-2 text-base leading-relaxed text-slate-500">
-            Review all customer orders and manage fulfillment status.
-          </p>
-        </div>
-      </div>
+      <PageHeader title="Admin Orders" subtitle="Review all customer orders and manage fulfillment status." actions={<SearchInput onChange={(value) => { setQuery(value); setPage(1); }} placeholder="Search orders..." />} />
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
+        <InlineAlert>{error}</InlineAlert>
       )}
 
       {orders.length === 0 && !error && (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-950">
-            No orders yet
-          </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Customer orders will appear here as soon as products are ordered.
-          </p>
-        </div>
+        <EmptyState title="No orders yet" message="Customer orders will appear here as soon as products are ordered." />
       )}
 
       <div className="space-y-4 lg:hidden">
-        {orders.map((order) => (
+        {visibleOrders.map((order) => (
           <article
             key={order._id}
             className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
@@ -148,14 +131,7 @@ const AdminOrders = () => {
                   {formatDate(order.createdAt)}
                 </p>
               </div>
-              <span
-                className={[
-                  "rounded-full border px-3 py-1 text-xs font-semibold capitalize",
-                  getStatusClass(order.status),
-                ].join(" ")}
-              >
-                {order.status}
-              </span>
+              <StatusBadge status={displayStatus(order.status)} />
             </div>
 
             <div className="mt-4 flex items-center justify-between gap-3">
@@ -204,7 +180,7 @@ const AdminOrders = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                {orders.map((order, index) => (
+                {visibleOrders.map((order, index) => (
                   <tr key={order._id} className={`table-row transition-colors duration-150 hover:bg-indigo-50/70 dark:hover:bg-slate-700/70 ${index % 2 === 0 ? "bg-white dark:bg-slate-900/70" : "bg-slate-50 dark:bg-slate-800/35"}`}>
                     <td className="px-5 py-4 font-mono text-sm font-semibold tabular-nums text-slate-950">
                       #{order._id.slice(-8).toUpperCase()}
@@ -224,14 +200,7 @@ const AdminOrders = () => {
                       {formatCurrency(order.totalPrice)}
                     </td>
                     <td className="px-5 py-3.5">
-                      <span
-                        className={[
-                          "rounded-full border px-3 py-1 text-xs font-semibold capitalize",
-                          getStatusClass(order.status),
-                        ].join(" ")}
-                      >
-                        {order.status}
-                      </span>
+                      <StatusBadge status={displayStatus(order.status)} />
                     </td>
                     <td className="px-5 py-3.5">
                       <select
@@ -256,6 +225,7 @@ const AdminOrders = () => {
           </div>
         </div>
       )}
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
     </section>
   );
 };

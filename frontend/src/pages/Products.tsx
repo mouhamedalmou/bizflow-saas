@@ -11,6 +11,11 @@ import {
   getProductName,
 } from "../utils/productDisplay";
 import { categoryName } from "../types";
+import { Button } from "../components/Button";
+import { EmptyState } from "../components/EmptyState";
+import { InlineAlert, PageHeader } from "../components/PageLayout";
+import { SearchInput } from "../components/SearchInput";
+import { StockBadge } from "../components/StockBadge";
 
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -29,6 +34,7 @@ const Products = () => {
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>(emptyShippingAddress);
   const [addressError, setAddressError] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -126,24 +132,18 @@ const Products = () => {
   }
 
   const productsList = Array.isArray(products) ? products : [];
+  const visibleProducts = productsList.filter((product) => `${getProductName(product)} ${product.category ? categoryName(product.category) : ""}`.toLowerCase().includes(query.toLowerCase()));
 
   return (
     <section className="space-y-8 font-sans lg:space-y-10">
-      <div>
-        <h1 className="font-display text-4xl font-extrabold tracking-tight text-slate-950 dark:text-slate-100 lg:text-5xl">Products</h1>
-        <p className="mt-2 text-base leading-relaxed text-slate-600 dark:text-slate-400">
-          Browse available products and stock levels.
-        </p>
-      </div>
+      <PageHeader title="Products" subtitle="Browse available products and stock levels." actions={<SearchInput onChange={setQuery} placeholder="Search products..." />} />
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
-          {error}
-        </div>
+        <InlineAlert>{error}</InlineAlert>
       )}
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
-        {productsList.map((product) => (
+        {visibleProducts.map((product) => (
           <article
             key={product._id}
             className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-black/20 dark:hover:border-indigo-500/60"
@@ -176,35 +176,22 @@ const Products = () => {
               <p className="font-mono text-lg font-bold tabular-nums text-slate-950 dark:text-slate-100">
                 {formatCurrency(product.price)}
               </p>
-              <span
-                className={[
-                  "rounded-md px-2.5 py-1 text-xs font-semibold",
-                  product.stock > 0
-                    ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
-                    : "bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-300",
-                ].join(" ")}
-              >
-                {product.stock > 0 ? "Available" : "Out of stock"}
-              </span>
+              <StockBadge stock={product.stock} />
             </div>
 
-            <button
+            <Button
               type="button"
               onClick={() => openOrderDialog(product)}
               disabled={product.stock < 1 || orderingId === product._id}
-              className="mx-5 mb-5 mt-5 min-h-11 w-[calc(100%-2.5rem)] rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 transition-all duration-200 hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 dark:disabled:bg-slate-700 dark:disabled:text-slate-400"
+              className="mx-5 mb-5 mt-5 w-[calc(100%-2.5rem)]"
             >
               {orderingId === product._id ? "Creating order..." : "Order now"}
-            </button>
+            </Button>
           </article>
         ))}
       </div>
 
-      {productsList.length === 0 && !error && (
-        <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-400">
-          No products found.
-        </div>
-      )}
+      {visibleProducts.length === 0 && !error && <EmptyState title="No products found" message={query ? "Try a different search term." : "Products will appear here when they are available."} />}
 
       <Modal isOpen={Boolean(selectedProduct)} onClose={closeOrderDialog} title="Shipping address" size="md">
         <form onSubmit={handleOrderNow} className="space-y-5">

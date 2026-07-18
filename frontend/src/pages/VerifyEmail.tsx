@@ -48,7 +48,7 @@ const VerifyEmail = () => {
     <section className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl items-center justify-center px-4 py-8">
       <div className="w-full max-w-lg overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-950 dark:shadow-black/30">
         <div className="border-b border-slate-200 bg-slate-50 px-6 py-5 dark:border-slate-800 dark:bg-slate-900">
-          <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
+          <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
             BizFlow SaaS
           </p>
           <h1 className="mt-2 text-2xl font-bold text-slate-950 dark:text-white">
@@ -64,7 +64,7 @@ const VerifyEmail = () => {
             className={[
               "flex items-start gap-3 rounded-lg border px-4 py-4",
               isLoading
-                ? "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900/70 dark:bg-blue-950/30 dark:text-blue-200"
+                ? "border-indigo-200 bg-indigo-50 text-indigo-800 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-200"
                 : isSuccess
                   ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-200"
                   : "border-red-200 bg-red-50 text-red-800 dark:border-red-900/70 dark:bg-red-950/30 dark:text-red-200",
@@ -74,7 +74,7 @@ const VerifyEmail = () => {
               className={[
                 "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold",
                 isLoading
-                  ? "bg-blue-600 text-white"
+                  ? "bg-indigo-600 text-white"
                   : isSuccess
                     ? "bg-emerald-600 text-white"
                     : "bg-red-600 text-white",
@@ -105,14 +105,14 @@ const VerifyEmail = () => {
             {isSuccess ? (
               <Link
                 to="/login"
-                className="inline-flex flex-1 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500"
               >
                 Continue to login
               </Link>
             ) : (
               <Link
                 to="/register"
-                className="inline-flex flex-1 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500"
               >
                 Create a new account
               </Link>

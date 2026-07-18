@@ -126,7 +126,7 @@ const Dashboard = () => {
     <section className="space-y-8 lg:space-y-10">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-4xl font-extrabold tracking-tight text-slate-100 lg:text-5xl">Dashboard</h1>
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-slate-950 dark:text-slate-100 lg:text-5xl">Dashboard</h1>
           <p className="mt-2 text-base leading-relaxed text-slate-500">
             Welcome back, {user?.name}. Your role is {user?.role}.
           </p>

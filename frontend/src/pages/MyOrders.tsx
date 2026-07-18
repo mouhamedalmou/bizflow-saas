@@ -3,6 +3,10 @@ import api from "../api/axios";
 import Loader from "../components/Loader";
 import type { Order, OrderStatus } from "../types";
 import { getApiErrorMessage } from "../api/axios";
+import { EmptyState } from "../components/EmptyState";
+import { InlineAlert, PageHeader } from "../components/PageLayout";
+import { Pagination } from "../components/Pagination";
+import { StatusBadge, type DisplayOrderStatus } from "../components/StatusBadge";
 
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -23,23 +27,11 @@ const formatDate = (value: string): string => {
   }).format(new Date(value));
 };
 
-const statusStyles: Record<OrderStatus, string> = {
-  pending: "bg-amber-50 text-amber-700 border-amber-200",
-  processing: "bg-blue-50 text-blue-700 border-blue-200",
-  shipped: "bg-indigo-50 text-indigo-700 border-indigo-200",
-  delivered: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  cancelled: "bg-red-50 text-red-700 border-red-200",
-};
-
-const getStatusClass = (status: OrderStatus): string => {
-  return statusStyles[status] || "bg-slate-50 text-slate-700 border-slate-200";
-};
-
 const MyOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     let isMounted = true;
@@ -71,41 +63,29 @@ const MyOrders = () => {
     return <Loader label="Loading your orders..." />;
   }
 
+  const totalPages = Math.ceil(orders.length / 10);
+  const visibleOrders = orders.slice((page - 1) * 10, page * 10);
+  const displayStatus = (status: OrderStatus): DisplayOrderStatus => status === "completed" ? "delivered" : status;
+
   return (
-    <section className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-100 lg:text-4xl">My Orders</h1>
-          <p className="text-sm text-slate-500">
-            Track your purchases and order status.
-          </p>
-        </div>
-      </div>
+    <section className="space-y-8 lg:space-y-10">
+      <PageHeader title="My Orders" subtitle="Track your purchases and order status." />
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
+        <InlineAlert>{error}</InlineAlert>
       )}
 
       {!error && orders.length === 0 && (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-950">
-            No orders yet
-          </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Your future orders will appear here after you buy a product.
-          </p>
-        </div>
+        <EmptyState title="No orders yet" message="Your future orders will appear here after you buy a product." />
       )}
 
       <div className="space-y-4">
-        {orders.map((order) => (
+        {visibleOrders.map((order) => (
           <article
             key={order._id}
-            className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
+            className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900/90"
           >
-            <div className="flex flex-col gap-4 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 border-b border-slate-200 px-5 py-4 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-500">
                   Order #{order._id.slice(-8).toUpperCase()}
@@ -116,21 +96,14 @@ const MyOrders = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <span
-                  className={[
-                    "rounded-full border px-3 py-1 text-xs font-semibold capitalize",
-                    getStatusClass(order.status),
-                  ].join(" ")}
-                >
-                  {order.status}
-                </span>
-                <p className="text-lg font-bold text-slate-950">
+                <StatusBadge status={displayStatus(order.status)} />
+                <p className="font-mono text-lg font-bold tabular-nums text-slate-950 dark:text-slate-100">
                   {formatCurrency(order.totalPrice)}
                 </p>
               </div>
             </div>
 
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {order.orderItems?.map((item) => (
                 <div
                   key={`${order._id}-${item.product}`}
@@ -143,7 +116,7 @@ const MyOrders = () => {
                   <p className="text-slate-600">
                     Unit: {formatCurrency(item.price)}
                   </p>
-                  <p className="font-semibold text-slate-950">
+                  <p className="font-mono font-semibold tabular-nums text-slate-950 dark:text-slate-100">
                     {formatCurrency(item.price * item.quantity)}
                   </p>
                 </div>
@@ -152,6 +125,7 @@ const MyOrders = () => {
           </article>
         ))}
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
     </section>
   );
 };
