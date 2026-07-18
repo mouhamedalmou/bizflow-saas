@@ -18,6 +18,8 @@ export const ThemeProvider = ({ children }: ChildrenProps) => {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
+    document.documentElement.dataset.theme = theme;
+    document.body.classList.toggle("light", !isDark);
     localStorage.setItem("theme", theme);
   }, [isDark, theme]);
 

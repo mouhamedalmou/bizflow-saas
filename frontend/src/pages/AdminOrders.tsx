@@ -27,16 +27,16 @@ const formatDate = (value: string): string => {
 };
 
 const statusStyles: Record<OrderStatus, string> = {
-  pending: "bg-amber-50 text-amber-700 border-amber-200",
-  processing: "bg-blue-50 text-blue-700 border-blue-200",
-  shipped: "bg-indigo-50 text-indigo-700 border-indigo-200",
-  delivered: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  cancelled: "bg-red-50 text-red-700 border-red-200",
+  pending: "border-amber-300 bg-amber-100 text-amber-950 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-200",
+  processing: "border-cyan-300 bg-cyan-100 text-cyan-950 dark:border-cyan-500/30 dark:bg-cyan-500/15 dark:text-cyan-200",
+  shipped: "border-blue-300 bg-blue-100 text-blue-950 dark:border-blue-500/30 dark:bg-blue-500/15 dark:text-blue-200",
+  delivered: "border-emerald-300 bg-emerald-100 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-200",
+  completed: "border-emerald-300 bg-emerald-100 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-200",
+  cancelled: "border-red-300 bg-red-100 text-red-950 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-200",
 };
 
 const getStatusClass = (status: OrderStatus): string => {
-  return statusStyles[status] || "bg-slate-50 text-slate-700 border-slate-200";
+  return statusStyles[status] || "border-slate-300 bg-slate-100 text-slate-900 dark:border-slate-500/30 dark:bg-slate-500/15 dark:text-slate-200";
 };
 
 const getStatusOptions = (currentStatus: OrderStatus): OrderStatus[] => {
@@ -134,7 +134,7 @@ const AdminOrders = () => {
         {orders.map((order) => (
           <article
             key={order._id}
-            className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+            className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -168,7 +168,7 @@ const AdminOrders = () => {
                   handleStatusChange(order._id, event.target.value as OrderStatus)
                 }
                 disabled={updatingId === order._id}
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm capitalize outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-2 text-sm font-medium capitalize text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
               >
                 {getStatusOptions(order.status).map((status) => (
                   <option key={status} value={status}>
@@ -182,26 +182,26 @@ const AdminOrders = () => {
       </div>
 
       {orders.length > 0 && (
-        <div className="hidden overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm lg:block">
+        <div className="hidden overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:block">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 text-sm">
-              <thead className="bg-slate-50 text-left text-slate-500">
+            <table className="min-w-full text-sm">
+              <thead className="border-b border-slate-300 bg-slate-100 text-left text-slate-900 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Order</th>
-                  <th className="px-4 py-3 font-medium">Customer</th>
-                  <th className="px-4 py-3 font-medium">Date</th>
-                  <th className="px-4 py-3 font-medium">Total</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Update</th>
+                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Order</th>
+                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Customer</th>
+                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Date</th>
+                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Total</th>
+                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Status</th>
+                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Update</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
-                {orders.map((order) => (
-                  <tr key={order._id}>
-                    <td className="px-4 py-3 font-medium text-slate-950">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                {orders.map((order, index) => (
+                  <tr key={order._id} className={`table-row transition-colors duration-150 hover:bg-indigo-50/70 dark:hover:bg-slate-700/70 ${index % 2 === 0 ? "bg-white dark:bg-slate-900/70" : "bg-slate-50 dark:bg-slate-800/35"}`}>
+                    <td className="px-5 py-3.5 font-semibold text-slate-950">
                       #{order._id.slice(-8).toUpperCase()}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <p className="font-medium text-slate-950">
                         {order.user?.name || "Unknown customer"}
                       </p>
@@ -209,13 +209,13 @@ const AdminOrders = () => {
                         {order.user?.email || "No email"}
                       </p>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-5 py-3.5 text-slate-700 dark:text-slate-300">
                       {formatDate(order.createdAt)}
                     </td>
-                    <td className="px-4 py-3 font-semibold text-slate-950">
+                    <td className="px-5 py-3.5 font-semibold text-slate-950">
                       {formatCurrency(order.totalPrice)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <span
                         className={[
                           "rounded-full border px-3 py-1 text-xs font-semibold capitalize",
@@ -225,14 +225,14 @@ const AdminOrders = () => {
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <select
                         value={order.status}
                         onChange={(event) =>
                           handleStatusChange(order._id, event.target.value as OrderStatus)
                         }
                         disabled={updatingId === order._id}
-                        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm capitalize outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                        className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-2 text-sm font-medium capitalize text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                       >
                         {getStatusOptions(order.status).map((status) => (
                           <option key={status} value={status}>

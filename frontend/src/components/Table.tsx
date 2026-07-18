@@ -3,7 +3,104 @@ import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { EmptyState } from "./EmptyState";
 import { Pagination } from "./Pagination";
 import { LoadingSpinner } from "./Spinner";
-export interface TableColumn<T> { key: string; header: ReactNode; render: (row: T) => ReactNode; sortValue?: (row: T) => string | number | Date; className?: string }
-export interface TableProps<T> { columns: TableColumn<T>[]; data: T[]; rowKey: (row: T) => string; loading?: boolean; sortable?: boolean; pagination?: { currentPage: number; totalPages: number; onPageChange: (page: number) => void }; emptyMessage?: string; caption?: string }
+
+export interface TableColumn<T> {
+  key: string;
+  header: ReactNode;
+  render: (row: T) => ReactNode;
+  sortValue?: (row: T) => string | number | Date;
+  className?: string;
+}
+
+export interface TableProps<T> {
+  columns: TableColumn<T>[];
+  data: T[];
+  rowKey: (row: T) => string;
+  loading?: boolean;
+  sortable?: boolean;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+  };
+  emptyMessage?: string;
+  caption?: string;
+}
+
 type Direction = "asc" | "desc";
-export function Table<T>({ columns, data, rowKey, loading = false, sortable = true, pagination, emptyMessage = "Non ci sono dati da visualizzare.", caption }: TableProps<T>) { const [sort, setSort] = useState<{ key: string; direction: Direction } | null>(null); const rows = useMemo(() => { if (!sort) return data; const column = columns.find((item) => item.key === sort.key); if (!column?.sortValue) return data; return [...data].sort((left, right) => { const a = column.sortValue?.(left); const b = column.sortValue?.(right); const comparison = a instanceof Date && b instanceof Date ? a.getTime() - b.getTime() : String(a).localeCompare(String(b), undefined, { numeric: true }); return sort.direction === "asc" ? comparison : -comparison; }); }, [columns, data, sort]); const toggleSort = (key: string) => setSort((current) => current?.key === key ? { key, direction: current.direction === "asc" ? "desc" : "asc" } : { key, direction: "asc" }); if (loading) return <div className="grid min-h-40 place-items-center rounded-lg border border-slate-700"><LoadingSpinner /></div>; if (!data.length) return <EmptyState message={emptyMessage} />; return <div className="space-y-4"><div className="overflow-x-auto rounded-lg border border-slate-700"><table className="min-w-full divide-y divide-slate-700"><caption className="sr-only">{caption}</caption><thead className="bg-slate-800/80"><tr>{columns.map((column) => <th key={column.key} scope="col" className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-300 ${column.className ?? ""}`}>{sortable && column.sortValue ? <button onClick={() => toggleSort(column.key)} className="inline-flex items-center gap-1 rounded outline-none focus-visible:ring-2 focus-visible:ring-indigo-400">{column.header}{sort?.key !== column.key ? <ChevronsUpDown size={14} /> : sort.direction === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />}</button> : column.header}</th>)}</tr></thead><tbody className="divide-y divide-slate-800 bg-slate-900/70">{rows.map((row) => <tr key={rowKey(row)} className="transition-colors duration-200 hover:bg-slate-800/60">{columns.map((column) => <td key={column.key} className={`whitespace-nowrap px-4 py-3 text-sm text-slate-200 ${column.className ?? ""}`}>{column.render(row)}</td>)}</tr>)}</tbody></table></div>{pagination && <Pagination {...pagination} />}</div>; }
+
+export function Table<T>({
+  columns,
+  data,
+  rowKey,
+  loading = false,
+  sortable = true,
+  pagination,
+  emptyMessage = "Non ci sono dati da visualizzare.",
+  caption,
+}: TableProps<T>) {
+  const [sort, setSort] = useState<{ key: string; direction: Direction } | null>(null);
+  const rows = useMemo(() => {
+    if (!sort) return data;
+    const column = columns.find((item) => item.key === sort.key);
+    if (!column?.sortValue) return data;
+    return [...data].sort((left, right) => {
+      const a = column.sortValue?.(left);
+      const b = column.sortValue?.(right);
+      const comparison = a instanceof Date && b instanceof Date
+        ? a.getTime() - b.getTime()
+        : String(a).localeCompare(String(b), undefined, { numeric: true });
+      return sort.direction === "asc" ? comparison : -comparison;
+    });
+  }, [columns, data, sort]);
+
+  const toggleSort = (key: string) => {
+    setSort((current) => current?.key === key
+      ? { key, direction: current.direction === "asc" ? "desc" : "asc" }
+      : { key, direction: "asc" });
+  };
+
+  if (loading) {
+    return <div className="grid min-h-40 place-items-center rounded-xl border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900"><LoadingSpinner /></div>;
+  }
+  if (!data.length) return <EmptyState message={emptyMessage} />;
+
+  return (
+    <div className="space-y-4">
+      <div className="overflow-x-auto rounded-xl border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <table className="min-w-full text-sm">
+          <caption className="sr-only">{caption}</caption>
+          <thead className="border-b border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800/80">
+            <tr>
+              {columns.map((column) => (
+                <th key={column.key} scope="col" className={`whitespace-nowrap px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wide text-slate-900 dark:text-slate-200 ${column.className ?? ""}`}>
+                  {sortable && column.sortValue ? (
+                    <button onClick={() => toggleSort(column.key)} className="inline-flex items-center gap-1 rounded outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                      {column.header}
+                      {sort?.key !== column.key ? <ChevronsUpDown size={14} /> : sort.direction === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                    </button>
+                  ) : column.header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            {rows.map((row, index) => (
+              <tr
+                key={rowKey(row)}
+                className={`table-row transition-colors duration-150 hover:bg-indigo-50/70 dark:hover:bg-slate-700/70 ${index % 2 === 0 ? "bg-white dark:bg-slate-900/70" : "bg-slate-50 dark:bg-slate-800/35"}`}
+              >
+                {columns.map((column) => (
+                  <td key={column.key} className={`whitespace-nowrap px-5 py-3.5 text-sm text-slate-900 dark:text-slate-200 ${column.className ?? ""}`}>
+                    {column.render(row)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {pagination && <Pagination {...pagination} />}
+    </div>
+  );
+}

@@ -1,4 +1,4 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import cors, { type CorsOptions } from "cors";
 import express, { type Express, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
@@ -13,6 +13,8 @@ import orderRoutes from "./routes/orderRoutes";
 import productRoutes from "./routes/productRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import userRoutes from "./routes/userRoutes";
+
+dotenv.config({ path: [".env.local", ".env"], quiet: true });
 
 const productionOrigin = "https://bizflowsaas.duckdns.org";
 const configuredOrigins = [process.env.CORS_ORIGIN, process.env.ALLOWED_ORIGINS, process.env.CLIENT_URL, process.env.FRONTEND_URL, productionOrigin];

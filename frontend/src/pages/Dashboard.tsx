@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { BadgeCheck, BarChart3, CircleDollarSign, FileText, Package, PieChart as PieChartIcon, ShoppingCart, Users } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -18,6 +19,7 @@ import api from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 import Loader from "../components/Loader";
+import { StatsCard } from "../components/StatsCard";
 import type { DashboardStats, Order, OrderStatus } from "../types";
 import { getApiErrorMessage } from "../api/axios";
 
@@ -27,6 +29,16 @@ const formatCurrency = (value: number): string => {
     currency: "USD",
   }).format(value || 0);
 };
+
+const ChartEmptyState = ({ icon, title, message }: { icon: ReactNode; title: string; message: string }) => (
+  <div className="grid h-full place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50/70 px-6 text-center dark:border-slate-700 dark:bg-slate-950/30">
+    <div>
+      <span className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300">{icon}</span>
+      <p className="mt-3 font-semibold text-slate-900 dark:text-slate-100">{title}</p>
+      <p className="mt-1 max-w-xs text-sm text-slate-600 dark:text-slate-400">{message}</p>
+    </div>
+  </div>
+);
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -93,6 +105,19 @@ const Dashboard = () => {
     completed: "#10b981",
     cancelled: "#ef4444",
   };
+  const monthlySales = stats?.monthlySales ?? [];
+  const ordersByStatus = stats?.ordersByStatus ?? [];
+  const hasRevenueData = monthlySales.some((item) => item.revenue > 0);
+  const hasSalesData = monthlySales.some((item) => item.orders > 0);
+  const hasStatusData = ordersByStatus.some((item) => item.count > 0);
+  const adminStats = [
+    { label: "Users", value: stats?.totalUsers ?? 0, icon: <Users size={21} />, color: "indigo" },
+    { label: "Products", value: stats?.totalProducts ?? 0, icon: <Package size={21} />, color: "emerald" },
+    { label: "Orders", value: stats?.totalOrders ?? 0, icon: <ShoppingCart size={21} />, color: "amber" },
+    { label: "Invoices", value: stats?.totalInvoices ?? 0, icon: <FileText size={21} />, color: "red" },
+    { label: "Subscriptions", value: stats?.activeSubscriptions ?? 0, icon: <BadgeCheck size={21} />, color: "emerald" },
+    { label: "Revenue", value: formatCurrency(stats?.totalRevenue ?? 0), icon: <CircleDollarSign size={21} />, color: "indigo" },
+  ] as const;
 
   return (
     <section className="space-y-6">
@@ -113,43 +138,8 @@ const Dashboard = () => {
 
       {user?.role === "admin" ? (
         <>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-sm text-slate-500">Users</p>
-              <p className="mt-2 text-2xl font-bold text-slate-950">
-                {stats?.totalUsers ?? 0}
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-sm text-slate-500">Products</p>
-              <p className="mt-2 text-2xl font-bold text-slate-950">
-                {stats?.totalProducts ?? 0}
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-sm text-slate-500">Orders</p>
-              <p className="mt-2 text-2xl font-bold text-slate-950">
-                {stats?.totalOrders ?? 0}
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-sm text-slate-500">Invoices</p>
-              <p className="mt-2 text-2xl font-bold text-slate-950">
-                {stats?.totalInvoices ?? 0}
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-sm text-slate-500">Subscriptions</p>
-              <p className="mt-2 text-2xl font-bold text-slate-950">
-                {stats?.activeSubscriptions ?? 0}
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-sm text-slate-500">Revenue</p>
-              <p className="mt-2 text-xl font-bold text-slate-950">
-                {formatCurrency(stats?.totalRevenue ?? 0)}
-              </p>
-            </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+            {adminStats.map((item) => <StatsCard key={item.label} {...item} />)}
           </div>
 
           <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
@@ -169,7 +159,7 @@ const Dashboard = () => {
               </div>
 
               <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
+                {hasRevenueData ? <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={stats?.monthlySales || []}>
                     <defs>
                       <linearGradient
@@ -220,7 +210,7 @@ const Dashboard = () => {
                       fill="url(#revenueGradient)"
                     />
                   </AreaChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer> : <ChartEmptyState icon={<BarChart3 size={22} />} title="No revenue data yet" message="Revenue activity will appear here as soon as orders are completed." />}
               </div>
             </div>
 
@@ -233,7 +223,7 @@ const Dashboard = () => {
               </p>
 
               <div className="mt-4 h-56">
-                <ResponsiveContainer width="100%" height="100%">
+                {hasStatusData ? <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={stats?.ordersByStatus || []}
@@ -255,7 +245,7 @@ const Dashboard = () => {
                       formatter={(value, name) => [value, name]}
                     />
                   </PieChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer> : <ChartEmptyState icon={<PieChartIcon size={22} />} title="No order activity yet" message="The fulfillment breakdown will appear after the first order." />}
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-2">
@@ -294,7 +284,7 @@ const Dashboard = () => {
             </div>
 
             <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
+              {hasSalesData ? <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats?.monthlySales || []}>
                   <CartesianGrid
                     stroke={chartGridColor}
@@ -319,7 +309,7 @@ const Dashboard = () => {
                   />
                   <Bar dataKey="orders" fill="#10b981" radius={[6, 6, 0, 0]} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ResponsiveContainer> : <ChartEmptyState icon={<BarChart3 size={22} />} title="No monthly sales yet" message="Monthly order volume will be displayed once sales begin." />}
             </div>
           </div>
 
