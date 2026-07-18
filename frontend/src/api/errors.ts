@@ -13,7 +13,10 @@ export function normalizeApiError(error: unknown, fallback = "Si è verificato u
   if (error instanceof ApiClientError) return error;
   if (!axios.isAxiosError<ApiErrorBody>(error)) return new ApiClientError(error instanceof Error ? error.message : fallback, 0);
   const status = error.response?.status ?? 0;
-  const message = error.response?.data?.message
+  const validationMessage = error.response?.data?.errors?.find((item) => item.msg || item.message);
+  const message = validationMessage?.msg
+    ?? validationMessage?.message
+    ?? error.response?.data?.message
     ?? error.response?.data?.error
     ?? (error.code === "ECONNABORTED"
       ? "La richiesta ha impiegato troppo tempo."

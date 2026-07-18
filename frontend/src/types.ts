@@ -78,7 +78,7 @@ export interface DashboardStats {
 export interface MonthlySale { month: string; revenue: number; orders: number }
 export interface StatusCount { status: OrderStatus; count: number }
 export interface ApiMessage { message: string }
-export interface ApiErrorBody { message?: string; error?: string }
+export interface ApiErrorBody { message?: string; error?: string; errors?: Array<{ msg?: string; message?: string }> }
 export interface ApiEnvelope<T> { success: boolean; data: T; pagination?: { page: number; limit: number; total: number; pages: number } }
 export interface ChartData { period: string; revenue: number; orders: number }
 export interface TrendData { date: string; orders: number; revenue: number }

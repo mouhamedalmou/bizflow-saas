@@ -49,7 +49,7 @@ const AdminProducts = () => {
       .get<Product[]>("/products")
       .then(({ data }) => {
         if (isMounted) {
-          setProducts(data);
+          setProducts(Array.isArray(data) ? data : []);
         }
       })
       .catch((err) => {
@@ -197,21 +197,23 @@ const AdminProducts = () => {
     return <Loader label="Loading admin products..." />;
   }
 
+  const productsList = Array.isArray(products) ? products : [];
+
   return (
-    <section className="space-y-6">
+    <section className="space-y-8 font-sans lg:space-y-10">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-100 lg:text-4xl">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-slate-950 dark:text-slate-100 lg:text-5xl">
             Admin Products
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="mt-2 text-base leading-relaxed text-slate-600 dark:text-slate-400">
             Create, update and remove products from the catalog.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
           {error}
         </div>
       )}
@@ -219,10 +221,10 @@ const AdminProducts = () => {
       <div className="space-y-6">
         <form
           onSubmit={handleSubmit}
-          className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+          className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-black/20 lg:p-8"
         >
           <div className="mb-5 flex items-center justify-between gap-3">
-            <h2 className="font-semibold text-slate-950">
+            <h2 className="font-display text-xl font-bold text-slate-950 dark:text-slate-100">
               Create product
             </h2>
           </div>
@@ -232,7 +234,7 @@ const AdminProducts = () => {
               <div>
                 <label
                   htmlFor="name"
-                  className="mb-1 block text-sm font-medium text-slate-700"
+                  className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Name
                 </label>
@@ -243,14 +245,14 @@ const AdminProducts = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-950 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-400"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="category"
-                  className="mb-1 block text-sm font-medium text-slate-700"
+                  className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Category
                 </label>
@@ -261,14 +263,14 @@ const AdminProducts = () => {
                   value={formData.category}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-950 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-400"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="price"
-                  className="mb-1 block text-sm font-medium text-slate-700"
+                  className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Price
                 </label>
@@ -281,14 +283,14 @@ const AdminProducts = () => {
                   value={formData.price}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-950 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-400"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="stock"
-                  className="mb-1 block text-sm font-medium text-slate-700"
+                  className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Stock
                 </label>
@@ -301,14 +303,14 @@ const AdminProducts = () => {
                   value={formData.stock}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-950 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-400"
                 />
               </div>
 
               <div className="sm:col-span-2">
                 <label
                   htmlFor="description"
-                  className="mb-1 block text-sm font-medium text-slate-700"
+                  className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Description
                 </label>
@@ -319,7 +321,7 @@ const AdminProducts = () => {
                   onChange={handleChange}
                   required
                   rows={4}
-                  className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-950 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-400"
                 />
               </div>
             </div>
@@ -334,11 +336,11 @@ const AdminProducts = () => {
               <div>
                 <label
                   htmlFor="imageFile"
-                  className="mb-1 block text-sm font-medium text-slate-700"
+                  className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                   Product image
                 </label>
-                <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
+                <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950/60">
                   <input
                     key={uploadInputKey}
                     id="imageFile"
@@ -356,7 +358,7 @@ const AdminProducts = () => {
                       )
                     }
                     disabled={uploading || saving}
-                    className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-700 disabled:cursor-not-allowed dark:text-slate-300"
+                    className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-indigo-500 disabled:cursor-not-allowed dark:text-slate-300"
                   />
                   <div className="mt-3 flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-400">
                     <span>
@@ -378,7 +380,7 @@ const AdminProducts = () => {
           <button
             type="submit"
             disabled={saving || uploading}
-            className="mt-5 w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+            className="mt-6 min-h-11 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 transition-all duration-200 hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-700"
           >
             {uploading
               ? "Uploading image..."
@@ -388,14 +390,14 @@ const AdminProducts = () => {
           </button>
         </form>
 
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-4 py-3">
-            <h2 className="font-semibold text-slate-950">Product catalog</h2>
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-black/20">
+          <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-700">
+            <h2 className="font-display text-xl font-bold text-slate-950 dark:text-slate-100">Product catalog</h2>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full table-fixed divide-y divide-slate-200 text-sm">
-              <thead className="bg-slate-50 text-left text-slate-500">
+            <table className="min-w-[900px] table-fixed divide-y divide-slate-200 font-sans text-sm dark:divide-slate-700">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500 dark:bg-slate-950/60 dark:text-slate-400">
                 <tr>
                   <th className="w-24 px-4 py-3 font-medium">Image</th>
                   <th className="px-4 py-3 font-medium">Product</th>
@@ -405,9 +407,9 @@ const AdminProducts = () => {
                   <th className="w-36 px-4 py-3 text-right font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
-                {products.map((product) => (
-                  <tr key={product._id}>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {productsList.map((product) => (
+                  <tr key={product._id} className="transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60">
                     <td className="px-4 py-3">
                       <ProductImage
                         src={product.image}
@@ -416,20 +418,22 @@ const AdminProducts = () => {
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-slate-950">
+                      <p className="font-semibold text-slate-950 dark:text-slate-100">
                         {getProductName(product)}
                       </p>
-                      <p className="max-w-sm truncate text-xs text-slate-500">
+                      <p className="max-w-sm truncate text-xs text-slate-500 dark:text-slate-400">
                         {getProductDescription(product.description)}
                       </p>
                     </td>
-                    <td className="px-4 py-3 text-slate-700">
-                      <span className="line-clamp-2">{categoryName(product.category)}</span>
+                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
+                      <span className="line-clamp-2">
+                        {product.category ? categoryName(product.category) : "Uncategorized"}
+                      </span>
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-950">
+                    <td className="px-4 py-3 font-mono font-medium tabular-nums text-slate-950 dark:text-slate-100">
                       {formatCurrency(product.price)}
                     </td>
-                    <td className="px-4 py-3 text-slate-700">
+                    <td className="px-4 py-3 font-mono font-medium tabular-nums text-slate-700 dark:text-slate-300">
                       {product.stock}
                     </td>
                     <td className="px-4 py-3">
@@ -437,14 +441,14 @@ const AdminProducts = () => {
                         <button
                           type="button"
                           onClick={() => handleEdit(product)}
-                          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
                         >
                           Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(product._id)}
-                          className="rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50"
+                          className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors duration-200 hover:bg-red-50 dark:border-red-500/30 dark:text-red-300 dark:hover:bg-red-500/10"
                         >
                           Delete
                         </button>
@@ -453,9 +457,9 @@ const AdminProducts = () => {
                   </tr>
                 ))}
 
-                {products.length === 0 && (
+                {productsList.length === 0 && (
                   <tr>
-                    <td className="px-4 py-6 text-slate-500" colSpan={6}>
+                    <td className="px-4 py-8 text-center text-slate-500 dark:text-slate-400" colSpan={6}>
                       No products found.
                     </td>
                   </tr>

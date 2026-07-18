@@ -17,7 +17,7 @@ const buildInitialForm = (product: Product): ProductForm => ({
   description: product.description || "",
   price: String(product.price ?? ""),
   stock: String(product.stock ?? ""),
-  category: categoryId(product.category),
+  category: product.category ? categoryId(product.category) : "",
   image: product.image || "",
 });
 
@@ -125,13 +125,13 @@ const EditProductModal = ({ product, onClose, onUpdated }: EditProductModalProps
         role="dialog"
         aria-modal="true"
         aria-labelledby="editProductTitle"
-        className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950"
+        className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl border border-slate-200 bg-white font-sans shadow-2xl dark:border-slate-800 dark:bg-slate-950"
       >
         <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-4 dark:border-slate-800 dark:bg-slate-950">
           <div>
             <h2
               id="editProductTitle"
-              className="text-lg font-bold text-slate-950 dark:text-white"
+              className="font-display text-xl font-bold tracking-tight text-slate-950 dark:text-white"
             >
               Edit product
             </h2>
