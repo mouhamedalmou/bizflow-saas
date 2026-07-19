@@ -142,37 +142,37 @@ const Products = () => {
         <InlineAlert>{error}</InlineAlert>
       )}
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5 xl:grid-cols-4">
         {visibleProducts.map((product) => (
           <article
             key={product._id}
-            className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-black/20 dark:hover:border-indigo-500/60"
+            className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-black/20 dark:hover:border-indigo-500/60"
           >
             <ProductImage
               src={product.image}
               alt={getProductName(product)}
-              className="h-60 rounded-none border-x-0 border-t-0 sm:h-64"
+              className="h-36 w-full shrink-0 rounded-b-none rounded-t-xl border-x-0 border-t-0 sm:h-40 lg:h-44"
             />
 
-            <div className="flex items-start justify-between gap-4 p-5 pb-0">
-              <div>
-                <h2 className="font-display font-bold text-slate-950 dark:text-slate-100">
+            <div className="flex items-start justify-between gap-2 px-4 pt-2">
+              <div className="min-w-0">
+                <h2 className="line-clamp-2 font-display font-bold leading-tight text-slate-950 dark:text-slate-100">
                   {getProductName(product)}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
                   {product.category ? categoryName(product.category) : "Uncategorized"}
                 </p>
               </div>
-              <span className="whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-1 font-mono text-xs font-medium tabular-nums text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-medium tabular-nums text-slate-700 dark:bg-slate-800 dark:text-slate-300 sm:text-xs">
                 {product.stock} in stock
               </span>
             </div>
 
-            <p className="mt-4 line-clamp-3 min-h-15 px-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            <p className="mt-1 line-clamp-2 px-4 text-sm leading-snug text-slate-600 dark:text-slate-400">
               {getProductDescription(product.description)}
             </p>
 
-            <div className="mt-5 flex items-center justify-between gap-4 px-5">
+            <div className="mt-2 flex items-center justify-between gap-3 px-4">
               <p className="font-mono text-lg font-bold tabular-nums text-slate-950 dark:text-slate-100">
                 {formatCurrency(product.price)}
               </p>
@@ -183,7 +183,7 @@ const Products = () => {
               type="button"
               onClick={() => openOrderDialog(product)}
               disabled={product.stock < 1 || orderingId === product._id}
-              className="mx-5 mb-5 mt-5 w-[calc(100%-2.5rem)]"
+              className="mx-4 mb-3 mt-2 min-h-9 w-[calc(100%-2rem)] py-1.5"
             >
               {orderingId === product._id ? "Creating order..." : "Order now"}
             </Button>

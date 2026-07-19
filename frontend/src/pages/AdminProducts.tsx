@@ -12,6 +12,7 @@ import { ConfirmDialog } from "../components/ConfirmDialog";
 import { InlineAlert, PageHeader } from "../components/PageLayout";
 import { SearchInput } from "../components/SearchInput";
 import { StockBadge } from "../components/StockBadge";
+import { Pencil, Trash2 } from "lucide-react";
 
 const emptyForm = {
   name: "",
@@ -322,7 +323,7 @@ const AdminProducts = () => {
               <ProductImage
                 src={formData.image}
                 alt={formData.name || "Product preview"}
-                className="h-44"
+                className="h-32 sm:h-36"
               />
 
               <div>
@@ -387,61 +388,80 @@ const AdminProducts = () => {
             <h2 className="font-display text-xl font-bold text-slate-950 dark:text-slate-100">Product catalog</h2>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] table-fixed divide-y divide-slate-200 font-sans text-sm dark:divide-slate-700">
+          <div className="min-w-0 overflow-hidden">
+            <table className="w-full max-w-full table-fixed divide-y divide-slate-200 font-sans text-xs lg:text-sm dark:divide-slate-700">
+              <colgroup>
+                <col className="w-[15%] sm:w-[10%] lg:w-[9%]" />
+                <col className="w-[60%] sm:w-[28%] lg:w-[23%]" />
+                <col className="hidden lg:table-column lg:w-[17%]" />
+                <col className="hidden sm:table-column sm:w-[14%] lg:w-[11%]" />
+                <col className="hidden sm:table-column sm:w-[10%] lg:w-[8%]" />
+                <col className="hidden sm:table-column sm:w-[18%] lg:w-[14%]" />
+                <col className="w-[25%] sm:w-[20%] lg:w-[18%]" />
+              </colgroup>
               <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500 dark:bg-slate-950/60 dark:text-slate-400">
                 <tr>
-                  <th className="w-24 px-4 py-3 font-medium">Image</th>
-                  <th className="px-4 py-3 font-medium">Product</th>
-                  <th className="w-40 px-4 py-3 font-medium">Category</th>
-                  <th className="w-24 px-4 py-3 font-medium">Price</th>
-                  <th className="w-20 px-4 py-3 font-medium">Stock</th>
-                  <th className="w-32 px-4 py-3 font-medium">Status</th>
-                  <th className="w-36 px-4 py-3 text-right font-medium">Actions</th>
+                  <th className="px-2 py-2 text-[10px] font-medium tracking-normal sm:px-3 lg:px-4 lg:py-3 lg:text-xs lg:tracking-wider">Image</th>
+                  <th className="px-2 py-2 text-[10px] font-medium tracking-normal sm:px-3 lg:px-4 lg:py-3 lg:text-xs lg:tracking-wider">Product</th>
+                  <th className="hidden px-4 py-3 font-medium lg:table-cell">Category</th>
+                  <th className="hidden px-3 py-2 text-[10px] font-medium sm:table-cell lg:px-4 lg:py-3 lg:text-xs">Price</th>
+                  <th className="hidden px-3 py-2 text-[10px] font-medium sm:table-cell lg:px-4 lg:py-3 lg:text-xs">Stock</th>
+                  <th className="hidden px-3 py-2 text-[10px] font-medium sm:table-cell lg:px-4 lg:py-3 lg:text-xs">Status</th>
+                  <th className="px-2 py-2 text-right text-[10px] font-medium tracking-normal sm:px-3 lg:px-4 lg:py-3 lg:text-xs lg:tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {visibleProducts.map((product) => (
                   <tr key={product._id} className="transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                    <td className="px-4 py-3">
+                    <td className="px-2 py-3 sm:px-3 lg:px-4">
                       <ProductImage
                         src={product.image}
                         alt={getProductName(product)}
-                        className="h-14 w-20"
+                        className="aspect-square h-8 w-8 shrink-0 sm:h-9 sm:w-9 lg:h-10 lg:w-10"
                       />
                     </td>
-                    <td className="px-4 py-3">
-                      <p className="font-semibold text-slate-950 dark:text-slate-100">
+                    <td className="min-w-0 px-2 py-3 sm:px-3 lg:px-4">
+                      <p className="line-clamp-2 break-words font-semibold leading-tight text-slate-950 dark:text-slate-100">
                         {getProductName(product)}
                       </p>
+                      <div className="mt-1 space-y-1 sm:hidden">
+                        <p className="line-clamp-1 text-[10px] text-slate-500 dark:text-slate-400">{product.category ? categoryName(product.category) : "Uncategorized"}</p>
+                        <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[10px] leading-tight text-slate-600 dark:text-slate-300">
+                          <span className="font-mono font-medium text-slate-950 dark:text-slate-100">{formatCurrency(product.price)}</span><span aria-hidden="true">·</span><span>Stock {product.stock}</span><StockBadge stock={product.stock} />
+                        </div>
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                      <span className="line-clamp-2">
+                    <td className="hidden min-w-0 break-words px-4 py-3 text-slate-700 dark:text-slate-300 lg:table-cell">
+                      <span className="line-clamp-2 break-words leading-tight">
                         {product.category ? categoryName(product.category) : "Uncategorized"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 font-mono font-medium tabular-nums text-slate-950 dark:text-slate-100">
+                    <td className="hidden break-words px-3 py-3 font-mono font-medium tabular-nums text-slate-950 dark:text-slate-100 sm:table-cell lg:px-4">
                       {formatCurrency(product.price)}
                     </td>
-                    <td className="px-4 py-3 font-mono font-medium tabular-nums text-slate-700 dark:text-slate-300">
+                    <td className="hidden break-words px-3 py-3 font-mono font-medium tabular-nums text-slate-700 dark:text-slate-300 sm:table-cell lg:px-4">
                       {product.stock}
                     </td>
-                    <td className="px-4 py-3"><StockBadge stock={product.stock} /></td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
+                    <td className="hidden px-3 py-3 sm:table-cell lg:px-4"><StockBadge stock={product.stock} /></td>
+                    <td className="px-2 py-3 sm:px-3 lg:px-4">
+                      <div className="flex justify-end gap-1 lg:gap-2">
                         <button
                           type="button"
+                          aria-label={`Edit ${getProductName(product)}`}
+                          title="Edit"
                           onClick={() => handleEdit(product)}
-                          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
+                          className="inline-flex h-9 w-9 shrink-0 items-center justify-center gap-1 rounded-md border border-slate-300 p-1 text-[10px] font-medium text-slate-700 transition-colors duration-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-700 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300 sm:h-8 sm:w-auto sm:px-2 lg:text-sm"
                         >
-                          Edit
+                          <Pencil className="h-3 w-3 shrink-0" /><span className="hidden sm:inline">Edit</span>
                         </button>
                         <button
                           type="button"
+                          aria-label={`Delete ${getProductName(product)}`}
+                          title="Delete"
                           onClick={() => setDeleteProduct(product)}
-                          className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors duration-200 hover:bg-red-50 dark:border-red-500/30 dark:text-red-300 dark:hover:bg-red-500/10"
+                          className="inline-flex h-9 w-9 shrink-0 items-center justify-center gap-1 rounded-md border border-red-200 p-1 text-[10px] font-medium text-red-700 transition-colors duration-200 hover:bg-red-50 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-red-500/30 dark:text-red-300 dark:hover:bg-red-500/10 sm:h-8 sm:w-auto sm:px-2 lg:text-sm"
                         >
-                          Delete
+                          <Trash2 className="h-3 w-3 shrink-0" /><span className="hidden sm:inline">Delete</span>
                         </button>
                       </div>
                     </td>

@@ -253,7 +253,7 @@ const EditProductModal = ({ product, onClose, onUpdated }: EditProductModalProps
               <ProductImage
                 src={formData.image}
                 alt={formData.name || "Product preview"}
-                className="h-56"
+                className="h-36 sm:h-40"
               />
 
               <div>

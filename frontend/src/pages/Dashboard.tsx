@@ -146,7 +146,7 @@ const Dashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
-            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:col-span-8 lg:p-8">
+            <div className="min-w-0 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:col-span-8 lg:p-8">
               <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <h2 className="font-semibold text-slate-950">
@@ -217,7 +217,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:col-span-4 lg:p-8">
+            <div className="min-w-0 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:col-span-4 lg:p-8">
               <h2 className="font-semibold text-slate-950">
                 Orders analytics
               </h2>
@@ -278,7 +278,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
+          <div className="min-w-0 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
             <div className="mb-4">
               <h2 className="font-semibold text-slate-950">Monthly sales</h2>
               <p className="text-sm text-slate-500">
@@ -320,29 +320,26 @@ const Dashboard = () => {
             <div className="border-b border-slate-200 px-4 py-3">
               <h2 className="font-semibold text-slate-950">Recent orders</h2>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
+            <div className="min-w-0 overflow-hidden">
+              <table className="w-full table-fixed divide-y divide-slate-200 text-[9px] sm:text-xs lg:text-sm">
                 <thead className="bg-slate-50 text-left text-slate-500">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Customer</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Total</th>
-                    <th className="px-4 py-3 font-medium">Date</th>
+                    {['Customer', 'Status', 'Total', 'Date'].map((label) => <th key={label} className="break-words px-1.5 py-2 font-medium sm:px-3 sm:py-3 lg:px-4">{label}</th>)}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {recentOrders.map((order) => (
                     <tr key={order._id}>
-                      <td className="px-4 py-3 text-slate-700">
+                      <td className="break-words px-1.5 py-2 text-slate-700 sm:px-3 sm:py-3 lg:px-4">
                         {order.user?.name || "Unknown"}
                       </td>
-                      <td className="px-4 py-3 text-slate-700">
+                      <td className="break-words px-1.5 py-2 text-slate-700 sm:px-3 sm:py-3 lg:px-4">
                         {order.status}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-950">
+                      <td className="break-words px-1.5 py-2 font-medium text-slate-950 sm:px-3 sm:py-3 lg:px-4">
                         {formatCurrency(order.totalPrice)}
                       </td>
-                      <td className="px-4 py-3 text-slate-500">
+                      <td className="break-words px-1.5 py-2 text-slate-500 sm:px-3 sm:py-3 lg:px-4">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </td>
                     </tr>

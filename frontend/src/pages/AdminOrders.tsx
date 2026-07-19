@@ -113,103 +113,55 @@ const AdminOrders = () => {
         <EmptyState title="No orders yet" message="Customer orders will appear here as soon as products are ordered." />
       )}
 
-      <div className="space-y-4 lg:hidden">
-        {visibleOrders.map((order) => (
-          <article
-            key={order._id}
-            className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="font-semibold text-slate-950">
-                  #{order._id.slice(-8).toUpperCase()}
-                </p>
-                <p className="mt-1 text-sm text-slate-500">
-                  {order.user?.name || "Unknown customer"}
-                </p>
-                <p className="text-sm text-slate-500">
-                  {formatDate(order.createdAt)}
-                </p>
-              </div>
-              <StatusBadge status={displayStatus(order.status)} />
-            </div>
-
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <p className="text-lg font-bold text-slate-950">
-                {formatCurrency(order.totalPrice)}
-              </p>
-              <select
-                value={order.status}
-                onChange={(event) =>
-                  handleStatusChange(order._id, event.target.value as OrderStatus)
-                }
-                disabled={updatingId === order._id}
-                className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-2 text-sm font-medium capitalize text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-              >
-                {getStatusOptions(order.status).map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </article>
-        ))}
-      </div>
-
       {orders.length > 0 && (
-        <div className="hidden overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:block">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1100px] table-fixed text-sm">
+        <div className="min-w-0 overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div className="min-w-0 overflow-hidden">
+            <table className="w-full table-fixed text-[8px] sm:text-[10px] md:text-xs lg:text-sm">
               <colgroup>
-                <col className="w-[13%]" />
-                <col className="w-[27%]" />
-                <col className="w-[16%]" />
-                <col className="w-[12%]" />
                 <col className="w-[14%]" />
-                <col className="w-[18%]" />
+                <col className="w-[25%]" />
+                <col className="w-[15%]" />
+                <col className="w-[13%]" />
+                <col className="w-[14%]" />
+                <col className="w-[19%]" />
               </colgroup>
               <thead className="border-b border-slate-300 bg-slate-100 text-left text-slate-900 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200">
                 <tr>
-                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Order</th>
-                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Customer</th>
-                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Date</th>
-                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Total</th>
-                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Status</th>
-                  <th className="px-5 py-3.5 text-xs font-bold uppercase tracking-wide">Update</th>
+                  {['Order', 'Customer', 'Date', 'Total', 'Status', 'Update'].map((label) => <th key={label} className="break-words px-1 py-2 text-[8px] font-bold uppercase tracking-normal sm:px-2 sm:text-[9px] md:px-3 md:py-3 lg:px-5 lg:py-3.5 lg:text-xs lg:tracking-wide">{label}</th>)}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                 {visibleOrders.map((order, index) => (
                   <tr key={order._id} className={`table-row transition-colors duration-150 hover:bg-indigo-50/70 dark:hover:bg-slate-700/70 ${index % 2 === 0 ? "bg-white dark:bg-slate-900/70" : "bg-slate-50 dark:bg-slate-800/35"}`}>
-                    <td className="px-5 py-4 font-mono text-sm font-semibold tabular-nums text-slate-950">
+                    <td className="break-all px-1 py-2 font-mono font-semibold tabular-nums text-slate-950 dark:text-slate-100 sm:px-2 md:px-3 lg:px-5 lg:py-4">
                       #{order._id.slice(-8).toUpperCase()}
                     </td>
-                    <td className="px-5 py-4">
-                      <p className="font-medium text-slate-950">
+                    <td className="min-w-0 px-1 py-2 sm:px-2 md:px-3 lg:px-5 lg:py-4">
+                      <p className="line-clamp-2 break-words font-medium leading-tight text-slate-950 dark:text-slate-100">
                         {order.user?.name || "Unknown customer"}
                       </p>
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="hidden break-all text-[8px] text-slate-500 sm:block lg:text-xs">
                         {order.user?.email || "No email"}
                       </p>
                     </td>
-                    <td className="px-5 py-4 text-slate-700 dark:text-slate-300">
+                    <td className="break-words px-1 py-2 leading-tight text-slate-700 dark:text-slate-300 sm:px-2 md:px-3 lg:px-5 lg:py-4">
                       {formatDate(order.createdAt)}
                     </td>
-                    <td className="px-5 py-4 font-mono font-semibold tabular-nums text-slate-950">
+                    <td className="break-words px-1 py-2 font-mono font-semibold tabular-nums text-slate-950 dark:text-slate-100 sm:px-2 md:px-3 lg:px-5 lg:py-4">
                       {formatCurrency(order.totalPrice)}
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-1 py-2 sm:px-2 md:px-3 lg:px-5 lg:py-3.5">
                       <StatusBadge status={displayStatus(order.status)} />
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-1 py-2 sm:px-2 md:px-3 lg:px-5 lg:py-3.5">
                       <select
                         value={order.status}
                         onChange={(event) =>
                           handleStatusChange(order._id, event.target.value as OrderStatus)
                         }
                         disabled={updatingId === order._id}
-                        className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-2 text-sm font-medium capitalize text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                        aria-label={`Update order ${order._id.slice(-8)} status`}
+                        className="w-full max-w-full rounded-md border border-slate-300 bg-slate-100 px-0.5 py-1 text-[7px] font-medium capitalize text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 sm:px-1 sm:text-[9px] md:text-xs lg:px-3 lg:py-2 lg:text-sm"
                       >
                         {getStatusOptions(order.status).map((status) => (
                           <option key={status} value={status}>

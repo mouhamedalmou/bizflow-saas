@@ -67,13 +67,13 @@ export function Table<T>({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded-xl border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
-        <table className="w-full min-w-[900px] text-sm">
+      <div className="min-w-0 overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <table className="w-full table-fixed text-[10px] sm:text-xs lg:text-sm">
           <caption className="sr-only">{caption}</caption>
           <thead className="border-b border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800/80">
             <tr>
               {columns.map((column) => (
-                <th key={column.key} scope="col" className={`whitespace-nowrap px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wide text-slate-900 dark:text-slate-200 ${column.className ?? ""}`}>
+                <th key={column.key} scope="col" className={`break-words px-1.5 py-2 text-left text-[9px] font-bold uppercase tracking-normal text-slate-900 dark:text-slate-200 sm:px-3 sm:py-3 sm:text-[10px] lg:px-5 lg:py-3.5 lg:text-xs lg:tracking-wide ${column.className ?? ""}`}>
                   {sortable && column.sortValue ? (
                     <button onClick={() => toggleSort(column.key)} className="inline-flex items-center gap-1 rounded outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
                       {column.header}
@@ -91,7 +91,7 @@ export function Table<T>({
                 className={`table-row transition-colors duration-150 hover:bg-indigo-50/70 dark:hover:bg-slate-700/70 ${index % 2 === 0 ? "bg-white dark:bg-slate-900/70" : "bg-slate-50 dark:bg-slate-800/35"}`}
               >
                 {columns.map((column) => (
-                  <td key={column.key} className={`whitespace-nowrap px-5 py-3.5 text-sm text-slate-900 dark:text-slate-200 ${column.className ?? ""}`}>
+                  <td key={column.key} className={`min-w-0 break-words px-1.5 py-2 text-[10px] text-slate-900 dark:text-slate-200 sm:px-3 sm:py-3 sm:text-xs lg:px-5 lg:py-3.5 lg:text-sm ${column.className ?? ""}`}>
                     {column.render(row)}
                   </td>
                 ))}
