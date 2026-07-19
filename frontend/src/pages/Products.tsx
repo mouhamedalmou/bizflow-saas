@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { getApiErrorMessage } from "../api/axios";
@@ -64,11 +64,11 @@ const Products = () => {
     setAddressError("");
   };
 
-  const closeOrderDialog = (): void => {
+  const closeOrderDialog = useCallback((): void => {
     if (orderingId) return;
     setSelectedProduct(null);
     setAddressError("");
-  };
+  }, [orderingId]);
 
   const handleAddressChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const field = event.target.name as keyof ShippingAddress;
